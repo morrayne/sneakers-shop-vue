@@ -2,7 +2,7 @@
 
 <template>
   <header class="header-home">
-    <img src="../../../public/vite.svg" alt="logo" class="logo" />
+    <p class="logo">「快歩」</p>
     <div class="header-nav">
       <router-link to="/home">HOME</router-link>
       <router-link to="/catalog">CATALOG</router-link>
@@ -29,8 +29,10 @@
 
   .logo {
     height: 100%;
-    aspect-ratio: 1 / 1;
-    padding: 0.5rem;
+    color: var(--main-header-text);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
   }
 
   .header-nav {
@@ -45,15 +47,14 @@
 
     * {
       height: 100%;
+      color: var(--main-header-text);
       padding: 0 2rem;
       display: flex;
       align-items: center;
       cursor: pointer;
     }
 
-    *:hover,
-    *:active,
-    *:focus {
+    *:hover, *:active, *:focus {
       background: var(--sub-header-bg);
     }
   }

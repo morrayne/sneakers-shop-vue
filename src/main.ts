@@ -1,7 +1,9 @@
+import App from "./App.vue";
 import { createApp } from "vue";
+// CSS
 import "./css/main.css";
 import "./css/tailwind.css";
-import App from "./App.vue";
+// ROUTER
 import router from "./helper/router";
 
 async function bootstrap() {
@@ -9,6 +11,8 @@ async function bootstrap() {
   const app = createApp(App);
   // ROUTER
   app.use(router);
+  // CONFIG
+  document.body.setAttribute("data-theme", "light");
   app.mount("#app");
 }
 

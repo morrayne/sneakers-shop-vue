@@ -88,6 +88,7 @@ import header_home from "../../components/header/header_home.vue";
         }
 
         .sub-h1 {
+          color: var(--main-header-text);
           position: absolute;
           top: 2rem;
           left: -6rem;
