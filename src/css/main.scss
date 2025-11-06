@@ -1,0 +1,98 @@
+// IMPORTS
+// @use '../pages/product/product_style.scss';
+// @use '../pages/profile/profile_style';
+
+// FONT
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap");
+:root {
+  --font-jetbrains-mono: "JetBrains Mono", monospace;
+}
+html {
+  font-family: "JetBrains Mono";
+  color: var(--main-text);
+  background: var(--main-bg);
+  overflow: hidden;
+}
+
+// RESET
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+ul, ol {
+  list-style: none;
+}
+
+// VARIABLES
+:root {
+  // header
+  --main-header-bg: #239dce;
+  --sub-header-bg: #0c5096;
+  --main-header-text: #ffffff;
+  --sub-header-text: #000000;
+}
+
+// DARK THEME
+:root [data-theme="dark"] {
+  // bg
+  --main-bg: #131414;
+  --sub-bg: #1e1e1e;
+  --extra-bg: #333333;
+  // text
+  --main-text: #fffffe;
+  --sub-text: #69686a;
+  --extra-text: #5c5c5c;
+  // accent
+  --main-accent: #260c79;
+  --sub-accent: #524594;
+  --extra-accent: #000000;
+  // extra
+  --transparent: #00000000;
+  --svg-invert: 1;
+}
+
+// LIGHT THEME
+[data-theme="light"] {
+  // bg
+  --main-bg: #ffffff;
+  --sub-bg: #f9f9f9;
+  --extra-bg: #f2f2f2;
+  // text
+  --main-text: #131414;
+  --sub-text: #242424;
+  --extra-text: #424242;
+  // accent
+  --main-accent: #260c79;
+  --sub-accent: #524594;
+  --extra-accent: #000000;
+  // extra
+  --transparent: #00000000;
+  --svg-invert: 0;
+}
