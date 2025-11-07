@@ -94,7 +94,7 @@ function afterRegisterRedirect() {
     <input type="text" v-model="data.name" placeholder="how should we call you?" required v-if="mode === 'register'" />
     <div class="avatar-grid" v-if="mode === 'register'">
       <div v-for="(avatar, index) in 20" :key="index" :class="['avatar-option', { active: data.icon === index }]" @click="data.icon = index">
-        <img :src="`/profile/${avatar}.jpg`" :alt="`Avatar ${index}`" />
+        <img :src="`/profile/${avatar - 1}.jpg`" :alt="`Avatar ${index}`" />
       </div>
     </div>
     <button class="reg" type="submit">
