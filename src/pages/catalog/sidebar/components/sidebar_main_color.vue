@@ -10,28 +10,25 @@ if (!filterState) { throw new Error("filterState is undefined! Проверьт�
 // props
 const props = defineProps<{ data_array: string[] }>();
 
-// вычисляем активный бренд
-const activeBrand = computed(() => filterState.state.filters.brand);
+// вычисляем активный цвет
+const activeColor = computed(() => filterState.state.filters.color);
 </script>
 
 <template>
   <div class="filter-holder">
-    <div class="size">Brand</div>
-    <sidebar_item
-      v-for="item in props.data_array"
-      :key="item"
-      :name="item"
-      :val="item"
-      :display_color="false"
-      :color="'#000'"
-      :active="activeBrand === item"
-      @was-clicked="() => filterState.methods.setFilter('brand', item)"
+    <div class="size">Colors</div>
+    <sidebar_item 
+      v-for="item in props.data_array" 
+      :key="item" 
+      :name="item" 
+      :val="item" 
+      :display_color="true" 
+      :color="item"
+      :active="activeColor === item"
+      @was-clicked="() => filterState.methods.setFilter('color', item)"
     />
   </div>
 </template>
-
-
-<!--  -->
 
 <style scoped lang="scss">
 .filter-holder {

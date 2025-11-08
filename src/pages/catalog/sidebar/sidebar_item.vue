@@ -5,6 +5,7 @@ const props = defineProps<{
   val: string;
   display_color: boolean;
   color: string;
+  active: boolean;
 }>();
 
 // emits
@@ -13,8 +14,8 @@ function handleClick() { emit('wasClicked', props.val) }
 </script>
 
 <template>
-  <div class="sidebar-item" @click="handleClick">
-    <div class="box"></div>
+  <div :class="props.active ? 'sidebar-item active' : 'sidebar-item'" @click="handleClick">
+    <!-- <div class="box"></div> -->
     <div class="text">{{ props.name }}</div>
     <div class="color" v-if="props.display_color" :style="{ background: `${props.color}` }"></div>
   </div>
@@ -22,10 +23,12 @@ function handleClick() { emit('wasClicked', props.val) }
 
 <style scoped lang="scss">
 .sidebar-item {
-  padding: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  cursor: pointer;
 
   .box {
     height: 0.75rem;
@@ -43,5 +46,9 @@ function handleClick() { emit('wasClicked', props.val) }
     border-radius: 0.25rem;
     cursor: pointer;
   }
+}
+
+.active {
+  background: var(--extra-bg);
 }
 </style>

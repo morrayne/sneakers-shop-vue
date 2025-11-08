@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// inject
+import { inject } from "vue";
+const { methods } = inject("filterState") as any;
+
 // props
 const props = defineProps<{
   color_array: any;
@@ -7,14 +11,20 @@ const props = defineProps<{
 }>();
 
 // components
-import sidebar_main_filter from "./components/sidebar_main_filter.vue";
+import sidebar_main_filter from "./components/sidebar_main_sort.vue";
 import sidebar_main_genders from "./components/sidebar_main_gender.vue";
-import sidebar_main_colors from "./components/sidebar_main_colors.vue";
+import sidebar_main_colors from "./components/sidebar_main_color.vue";
 import sidebar_main_brands from "./components/sidebar_main_brand.vue";
+
+// заполнение поисковой строки
+function handleinput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  methods.setSearch(target.value);
+}
 </script>
 
 <template>
-  <input type="text" class="search" placeholder="Nike Air Max 95" />
+  <input type="text" class="search" placeholder="Nike Air Max 95" @input="handleinput($event)" />
   <sidebar_main_filter />
   <sidebar_main_colors :data_array="props.color_array" />
   <sidebar_main_genders :data_array="props.gender_array" />

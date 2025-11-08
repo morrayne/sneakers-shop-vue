@@ -1,5 +1,5 @@
 // IMPORTS
-// @use '../pages/product/product_style.scss';
+@use '../pages/product/product_main';
 // @use '../pages/profile/profile_style';
 
 // FONT
@@ -70,8 +70,8 @@ ul, ol {
   --sub-text: #69686a;
   --extra-text: #5c5c5c;
   // accent
-  --main-accent: #260c79;
-  --sub-accent: #524594;
+  --main-accent: #1c274c;
+  --sub-accent: #29396d;
   --extra-accent: #000000;
   // extra
   --transparent: #00000000;

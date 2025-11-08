@@ -1,4 +1,161 @@
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap");
+main {
+  height: 100%;
+  display: flex;
+}
+main .left {
+  width: 32rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+main .left .tags {
+  height: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+main .left .tags .tag {
+  font-size: 0.8rem;
+  color: var(--extra-text);
+  background: var(--extra-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+main .left .main-img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  position: relative;
+  overflow: hidden;
+}
+main .left .main-img img {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+main .left .img-wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+main .left .img-wrapper .img-holder {
+  width: 100%;
+  aspect-ratio: 1/1;
+  position: relative;
+  overflow: hidden;
+}
+main .left .img-wrapper .img-holder img {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+main .left .filler {
+  width: 100%;
+  background: var(--extra-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+main .right {
+  min-width: 40%;
+  padding-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+}
+main .right .model-name {
+  font-size: 3rem;
+  font-weight: 300;
+}
+main .right .model-rating {
+  color: var(--extra-text);
+  font-weight: 700;
+}
+main .right .model-cost {
+  font-size: 4rem;
+  font-weight: 500;
+}
+main .right .model-colors {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+main .right .model-colors .img-wrapper {
+  width: 6rem;
+  aspect-ratio: 1/1;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+main .right .model-colors .img-wrapper img {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+main .right .model-sizes {
+  margin-top: 2rem;
+  max-width: 22rem;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+main .right .model-sizes .size {
+  font-size: 0.8rem;
+  color: var(--extra-text);
+  background: var(--extra-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+main .right .model-sizes .active-size {
+  font-size: 0.8rem;
+  color: var(--main-bg);
+  background: var(--main-text);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+main .right .duo-button {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+main .right .duo-button .cart {
+  width: 32rem;
+  padding: 0.5rem 0;
+  background: var(--extra-bg);
+  border-radius: 0.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  cursor: pointer;
+}
+main .right .duo-button .cart img {
+  height: 2rem;
+}
+main .right .duo-button :disabled {
+  cursor: not-allowed;
+}
+main .right .duo-button .favourite {
+  padding: 0.5rem;
+  background: var(--main-text);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+main .right .duo-button .favourite img {
+  height: 2rem;
+  filter: invert(1);
+}
+main .right .duo-button :disabled {
+  cursor: not-allowed;
+}
+
 :root {
   --font-jetbrains-mono: "JetBrains Mono", monospace;
 }
@@ -64,8 +221,8 @@ ul, ol {
   --main-text: #fffffe;
   --sub-text: #69686a;
   --extra-text: #5c5c5c;
-  --main-accent: #260c79;
-  --sub-accent: #524594;
+  --main-accent: #1c274c;
+  --sub-accent: #29396d;
   --extra-accent: #000000;
   --transparent: #00000000;
   --svg-invert: 1;

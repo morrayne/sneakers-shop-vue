@@ -1,9 +1,17 @@
 <script setup lang="ts">
+// inject
+import { inject, computed } from "vue";
+import sidebar_item from "../sidebar_item.vue";
+
+// filterState через inject
+const filterState = inject("filterState") as any;
+if (!filterState) { throw new Error("filterState is undefined! Проверьте provide в родителе.") }
+
 // props
 const props = defineProps<{ data_array: string[] }>();
 
-// imports
-import sidebar_item from "../sidebar_item.vue";
+// вычисляем активный пол
+const activeGender = computed(() => filterState.state.filters.gender);
 </script>
 
 <template>
@@ -16,6 +24,8 @@ import sidebar_item from "../sidebar_item.vue";
       :val="item" 
       :display_color="false" 
       :color="'#000'"
+      :active="activeGender === item"
+      @was-clicked="() => filterState.methods.setFilter('gender', item)"
     />
   </div>
 </template>
