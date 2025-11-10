@@ -14,12 +14,16 @@ import type { user_type } from '../../../helper/types';
 
 // vars
 const mode = ref<"login" | "register">("login");
-const data = reactive({
+const data = reactive<any>({
   id: "",
   email: "",
   password: "",
   name: "",
   icon: 0,
+  favourite: [{
+    id: 0,
+    color: 0,
+  }]
 });
 
 // отправка формы
@@ -110,7 +114,8 @@ function afterRegisterRedirect() {
 form {
   width: 24rem;
   padding: 1rem;
-  background: var(--extra-bg);
+  background: var(--bg-c);
+  outline: solid 2px var(--bg-d);
   border-radius: 1rem;
   display: flex;
   flex-direction: column;
@@ -118,7 +123,7 @@ form {
   input {
     margin-bottom: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--sub-bg);
+    background: var(--bg-b);
     border-radius: 0.5rem;
   }
 
@@ -129,7 +134,7 @@ form {
     gap: 0.2rem;
 
     .active {
-      outline: solid 2px var(--main-text);
+      outline: solid 2px var(--text-a);
     }
   }
 
@@ -137,13 +142,13 @@ form {
     margin-bottom: 0.5rem;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    background: var(--main-text);
-    color: var(--main-bg);
+    background: var(--text-a);
+    color: var(--bg-a);
   }
 
   .switch {
     text-align: left;
-    color: var(--extra-text);
+    color: var(--text-c);
     font-size: 0.8rem;
     cursor: pointer;
   }

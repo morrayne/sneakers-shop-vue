@@ -3,10 +3,10 @@
 import { ref, onMounted } from "vue";
 
 // router
-import router from "../../../../helper/router";
+import router from "../../../helper/router";
 
 // pinia
-import { useGlobalState } from "../../../../helper/pinia";
+import { useGlobalState } from "../../../helper/pinia";
 const global = useGlobalState();
 
 // vars
@@ -17,21 +17,18 @@ const props = defineProps<{
   data: any;
 }>();
 
-// редирект на страницу товара
+// functions
 function navigateToProduct() {
   router.push(`/product/${props.data.id}`);
 }
-
-// выбор активного цвета
 function setActiveColor(val: any, event: Event) {
-  event.stopPropagation(); // Останавливаем всплытие
+  event.stopPropagation(); 
   active_color.value = val;
 }
 
 // обработчик клика по кнопке цены
 function handlePriceClick(event: Event) {
-  event.stopPropagation(); // Останавливаем всплытие
-  // Здесь может быть логика добавления в корзину и т.д.
+  event.stopPropagation();
   if (global.user.id !== 'filler') {
     console.log('Add to cart:', props.data);
   }
@@ -82,7 +79,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .card {
   height: fit-content;
-  background: var(--extra-bg);
+  background: var(--bg-c);
   padding: 1rem;
   border-radius: 1rem;
   display: flex;
@@ -92,7 +89,7 @@ onMounted(() => {
   .name {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--main-text);
+    color: var(--text-a);
   }
 
   .img-holder {
@@ -119,9 +116,8 @@ onMounted(() => {
 
       .rating {
         font-size: 0.8rem;
-        color: var(--main-text);
-        background: var(--extra-bg);
-        filter: brightness(0.9);
+        color: var(--text-a);
+        background: var(--bg-d);
         padding: 0.2rem 0.5rem;
         margin-left: auto;
         border-radius: 0.5rem;
@@ -144,7 +140,7 @@ onMounted(() => {
 
   .sub-name {
     font-size: 0.8rem;
-    color: var(--extra-text);
+    color: var(--text-c);
   }
 
   .tags-holder {
@@ -154,9 +150,8 @@ onMounted(() => {
 
     .tag {
       font-size: 0.8rem;
-      color: var(--main-text);
-      background: var(--extra-bg);
-      filter: brightness(0.9);
+      color: var(--text-c);
+      background: var(--bg-d);
       padding: 0.2rem 0.5rem;
       border-radius: 0.5rem;
       cursor: pointer;
@@ -168,8 +163,8 @@ onMounted(() => {
     margin-top: 0.25rem;
     padding: 0.25rem 0;
     border-radius: 0.5rem;
-    background: var(--sub-text);
-    color: var(--main-bg);
+    background: var(--text-b);
+    color: var(--bg-a);
     cursor: pointer;
   }
   :disabled {

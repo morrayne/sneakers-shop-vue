@@ -8,6 +8,9 @@ const user_filler = {
   password: "filler",
   name: "filler",
   icon: 0,
+  favourite: [],
+  basket: [],
+  history: [],
 };
 const config_filler = {
   lang: "",

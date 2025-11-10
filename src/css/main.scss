@@ -9,8 +9,8 @@
 }
 html {
   font-family: "JetBrains Mono";
-  color: var(--main-text);
-  background: var(--main-bg);
+  color: var(--text-a);
+  background: var(--bg-a);
   overflow: hidden;
 }
 
@@ -49,6 +49,9 @@ a {
 ul, ol {
   list-style: none;
 }
+svg {
+  filter: invert(var(--svg-invert));
+}
 
 // VARIABLES
 :root {
@@ -62,13 +65,14 @@ ul, ol {
 // DARK THEME
 :root [data-theme="dark"] {
   // bg
-  --main-bg: #131414;
-  --sub-bg: #1e1e1e;
-  --extra-bg: #333333;
+  --bg-a: #131414;
+  --bg-b: #1e1e1e;
+  --bg-c: #333333;
+  --bg-d: #424242;
   // text
-  --main-text: #fffffe;
-  --sub-text: #69686a;
-  --extra-text: #5c5c5c;
+  --text-a: #fffffe;
+  --text-b: #69686a;
+  --text-c: #5c5c5c;
   // accent
   --main-accent: #1c274c;
   --sub-accent: #29396d;
@@ -81,13 +85,14 @@ ul, ol {
 // LIGHT THEME
 [data-theme="light"] {
   // bg
-  --main-bg: #ffffff;
-  --sub-bg: #f9f9f9;
-  --extra-bg: #f2f2f2;
+  --bg-a: #ffffff;
+  --bg-b: #f9f9f9;
+  --bg-c: #f2f2f2;
+  --bg-d: #dadada;
   // text
-  --main-text: #131414;
-  --sub-text: #242424;
-  --extra-text: #424242;
+  --text-a: #131414;
+  --text-b: #242424;
+  --text-c: #424242;
   // accent
   --main-accent: #260c79;
   --sub-accent: #524594;

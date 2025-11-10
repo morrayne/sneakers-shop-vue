@@ -1,5 +1,5 @@
 // supabase
-import { supabase } from "../../../helper/supabase";
+import { supabase } from "../../helper/supabase";
 
 // получение массива цветов
 export async function fetchColors(): Promise<string[]> {

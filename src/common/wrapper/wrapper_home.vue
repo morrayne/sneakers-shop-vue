@@ -30,6 +30,7 @@
       height: 100%;
       position: relative;
       background: var(--main-header-bg);
+      border: solid 1px var(--sub-header-bg);
       border-radius: 1rem;
       display: flex;
       flex-direction: column;

@@ -20,7 +20,7 @@
   .search {
     width: 100%;
     height: 3rem;
-    background: var(--extra-bg);
+    background: var(--bg-c);
   }
 
   .item {
@@ -31,12 +31,12 @@
 
     .big {
       height: 2.5rem;
-      background: var(--extra-bg);
+      background: var(--bg-c);
     }
 
     .space {
       height: 1.5rem;
-      background: var(--extra-bg);
+      background: var(--bg-c);
     }
   }
 }

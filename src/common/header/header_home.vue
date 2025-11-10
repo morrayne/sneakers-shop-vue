@@ -10,11 +10,15 @@ const global = useGlobalState();
     <div class="header-nav">
       <router-link to="/home">HOME</router-link>
       <router-link to="/catalog">CATALOG</router-link>
-      <router-link to="/profile">PROFILE</router-link>
+      <router-link to="/favourite">FAVOURITE</router-link>
+      <router-link to="/basket">BASKET</router-link>
+      <router-link to="/history">HISTORY</router-link>
+      <router-link to="/settings">SETTINGS</router-link>
     </div>
-    <div class="icon-wrapper" v-if="global.user.id !== 'filler'">
-      <img :src="`../../../public/profile/${global.user.icon}.jpg`" alt="user-icon">
-    </div>
+    <router-link class="icon-wrapper" to="/profile">
+      <img v-if="global.user.id !== 'filler'" :src="`../../../public/profile/${global.user.icon}.jpg`" alt="user-icon">
+      <img v-else :src="`../../../public/profile/0.jpg`" alt="user-icon">
+    </router-link>
   </header>
 </template>
 

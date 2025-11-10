@@ -10,11 +10,15 @@ const global = useGlobalState();
     <div class="header-nav">
       <router-link to="/home">HOME</router-link>
       <router-link to="/catalog">CATALOG</router-link>
-      <router-link to="/profile">PROFILE</router-link>
+      <router-link to="/favourite">FAVOURITE</router-link>
+      <router-link to="/basket">BASKET</router-link>
+      <router-link to="/history">HISTORY</router-link>
+      <router-link to="/settings">SETTINGS</router-link>
     </div>
-    <div class="icon-wrapper" v-if="global.user.id !== 'filler'">
-      <img :src="`../../../public/profile/${global.user.icon}.jpg`" alt="user-icon">
-    </div>
+    <router-link class="icon-wrapper" to="/profile">
+      <img v-if="global.user.id !== 'filler'" :src="`../../../public/profile/${global.user.icon}.jpg`" alt="user-icon">
+      <img v-else :src="`../../../public/profile/0.jpg`" alt="user-icon">
+    </router-link>
   </header>
 </template>
 
@@ -23,14 +27,14 @@ const global = useGlobalState();
   width: 100%;
   height: 4rem;
   padding: 0 4rem;
-  border-bottom: solid 0.125rem var(--extra-bg);
+  border-bottom: solid 0.125rem var(--bg-c);
   display: flex;
   justify-content: space-between;
   position: relative;
 
   .logo {
     height: 100%;
-    color: var(--main-text);
+    color: var(--text-a);
     font-size: 1.5rem;
     display: flex;
     align-items: center;
@@ -48,7 +52,7 @@ const global = useGlobalState();
 
     * {
       height: 100%;
-      color: var(--main-text);
+      color: var(--text-a);
       padding: 0 2rem;
       display: flex;
       align-items: center;
@@ -58,7 +62,7 @@ const global = useGlobalState();
     *:hover,
     *:active,
     *:focus {
-      background: var(--extra-bg);
+      background: var(--bg-c);
     }
   }
 

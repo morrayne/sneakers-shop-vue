@@ -16,21 +16,21 @@
   width: 100%;
   padding: 1rem;
   aspect-ratio: 5 / 6;
-  background: var(--extra-bg);
+  background: var(--bg-c);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 
   .img {
     width: 100%;
-    aspect-ratio: 6 / 5;
-    background: var(--sub-bg);
+    aspect-ratio: 7 / 5;
+    background: var(--bg-b);
   }
 
   .name {
     width: 80%;
     height: 3rem;
-    background: var(--sub-bg);
+    background: var(--bg-b);
   }
 
   .wrapper {
@@ -40,14 +40,14 @@
 
     .sub {
       height: 2rem;
-      background: var(--sub-bg);
+      background: var(--bg-b);
     }
   }
 
   .btn {
      width: 100%;
     height: 3rem;
-    background: var(--sub-bg);
+    background: var(--bg-b);
   }
 }
 </style>

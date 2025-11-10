@@ -1,7 +1,4 @@
 <script setup lang="ts">
-// vue
-import { reactive, ref } from "vue";
-
 // supabase
 import { supabase } from "../../../helper/supabase";
 
@@ -21,6 +18,9 @@ async function logout() {
       password: "filler",
       name: "filler",
       icon: 0,
+      favourite: [],
+      basket: [],
+      history: [],
     };
     console.log("Пользователь вышел из системы");
   }
@@ -28,14 +28,25 @@ async function logout() {
 </script>
 
 <template>
-  <button class="log-out" @click="logout">Log Out</button>
+  <div class="prof">
+    <img :src="`/public/profile/${global.user.icon}.jpg`" alt="" />
+    <button class="log-out" @click="logout">Log Out</button>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.log-out {
-  width: 100%;
-  padding: 0.5rem 0;
-  background: var(--main-text);
-  color: var(--main-bg);
+.prof {
+  padding: 1rem;
+  background: var(--extra-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .log-out {
+    width: 100%;
+    padding: 0.5rem 0;
+    background: var(--text-a);
+    color: var(--bg-a);
+  }
 }
 </style>

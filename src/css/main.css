@@ -17,8 +17,8 @@ main .left .tags {
 }
 main .left .tags .tag {
   font-size: 0.8rem;
-  color: var(--extra-text);
-  background: var(--extra-bg);
+  color: var(--text-c);
+  background: var(--bg-c);
   padding: 0.2rem 0.5rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -54,7 +54,7 @@ main .left .img-wrapper .img-holder img {
 }
 main .left .filler {
   width: 100%;
-  background: var(--extra-bg);
+  background: var(--bg-c);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +71,7 @@ main .right .model-name {
   font-weight: 300;
 }
 main .right .model-rating {
-  color: var(--extra-text);
+  color: var(--text-c);
   font-weight: 700;
 }
 main .right .model-cost {
@@ -106,16 +106,16 @@ main .right .model-sizes {
 }
 main .right .model-sizes .size {
   font-size: 0.8rem;
-  color: var(--extra-text);
-  background: var(--extra-bg);
+  color: var(--text-c);
+  background: var(--bg-c);
   padding: 0.2rem 0.5rem;
   border-radius: 0.5rem;
   cursor: pointer;
 }
 main .right .model-sizes .active-size {
   font-size: 0.8rem;
-  color: var(--main-bg);
-  background: var(--main-text);
+  color: var(--bg-a);
+  background: var(--text-a);
   padding: 0.2rem 0.5rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -128,7 +128,7 @@ main .right .duo-button {
 main .right .duo-button .cart {
   width: 32rem;
   padding: 0.5rem 0;
-  background: var(--extra-bg);
+  background: var(--bg-c);
   border-radius: 0.25rem;
   display: flex;
   justify-content: center;
@@ -144,7 +144,7 @@ main .right .duo-button :disabled {
 }
 main .right .duo-button .favourite {
   padding: 0.5rem;
-  background: var(--main-text);
+  background: var(--text-a);
   border-radius: 0.25rem;
   cursor: pointer;
 }
@@ -162,8 +162,8 @@ main .right .duo-button :disabled {
 
 html {
   font-family: "JetBrains Mono";
-  color: var(--main-text);
-  background: var(--main-bg);
+  color: var(--text-a);
+  background: var(--bg-a);
   overflow: hidden;
 }
 
@@ -207,6 +207,10 @@ ul, ol {
   list-style: none;
 }
 
+svg {
+  filter: invert(var(--svg-invert));
+}
+
 :root {
   --main-header-bg: #239dce;
   --sub-header-bg: #0c5096;
@@ -215,12 +219,13 @@ ul, ol {
 }
 
 :root [data-theme=dark] {
-  --main-bg: #131414;
-  --sub-bg: #1e1e1e;
-  --extra-bg: #333333;
-  --main-text: #fffffe;
-  --sub-text: #69686a;
-  --extra-text: #5c5c5c;
+  --bg-a: #131414;
+  --bg-b: #1e1e1e;
+  --bg-c: #333333;
+  --bg-d: #424242;
+  --text-a: #fffffe;
+  --text-b: #69686a;
+  --text-c: #5c5c5c;
   --main-accent: #1c274c;
   --sub-accent: #29396d;
   --extra-accent: #000000;
@@ -229,12 +234,13 @@ ul, ol {
 }
 
 [data-theme=light] {
-  --main-bg: #ffffff;
-  --sub-bg: #f9f9f9;
-  --extra-bg: #f2f2f2;
-  --main-text: #131414;
-  --sub-text: #242424;
-  --extra-text: #424242;
+  --bg-a: #ffffff;
+  --bg-b: #f9f9f9;
+  --bg-c: #f2f2f2;
+  --bg-d: #dadada;
+  --text-a: #131414;
+  --text-b: #242424;
+  --text-c: #424242;
   --main-accent: #260c79;
   --sub-accent: #524594;
   --extra-accent: #000000;

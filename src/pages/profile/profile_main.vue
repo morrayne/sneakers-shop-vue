@@ -1,8 +1,5 @@
 <script setup lang="ts">
-// vue
-// import { onMounted } from "vue";
-
-// pinia storage
+// pinia
 import { useGlobalState } from "../../helper/pinia";
 const global = useGlobalState();
 
@@ -34,8 +31,8 @@ main {
 
   .left {
     width: 24rem;
-    padding: 1rem 0.5rem;
-    border-right: solid 0.125rem var(--extra-bg);
+    padding: 1rem;
+    border-right: solid 0.125rem var(--bg-c);
   }
 
   .full-right {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 // vue
-import { ref, reactive, onMounted, provide, watch } from "vue";
+import { ref, reactive, onMounted, provide } from "vue";
 
 // imports
-import sidebar_filler from "./sidebar/components/sidebar_filler.vue";
+import sidebar_filler from "./fillers/sidebar_filler.vue";
 
 // fetch functions
-import { fetchColors, fetchBrands, fetchGenders } from "./sidebar/sidebar_script";
+import { fetchColors, fetchBrands, fetchGenders } from "./catalog_fetch";
 
 // components
 import header_main from "../../common/header/header_main.vue";
@@ -82,10 +82,6 @@ provide("filterState", {
     setFilter,
   },
 });
-
-watch(() => everything, (newVal) => {
-  console.log("Стало:", newVal);
-}, { deep: true });
 </script>
 
 <template>
@@ -111,7 +107,7 @@ main {
   .left {
     width: 18rem;
     padding: 1rem;
-    border-right: solid 0.125rem var(--extra-bg);
+    border-right: solid 0.125rem var(--bg-c);
     display: flex;
     flex-direction: column;
     gap: 1rem;

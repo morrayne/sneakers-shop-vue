@@ -16,8 +16,8 @@ main {
 
       .tag {
         font-size: 0.8rem;
-        color: var(--extra-text);
-        background: var(--extra-bg);
+        color: var(--text-c);
+        background: var(--bg-c);
         padding: 0.2rem 0.5rem;
         border-radius: 0.5rem;
         cursor: pointer;
@@ -60,7 +60,7 @@ main {
 
     .filler {
       width: 100%;
-      background: var(--extra-bg);
+      background: var(--bg-c);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -80,7 +80,7 @@ main {
     }
 
     .model-rating {
-      color: var(--extra-text);
+      color: var(--text-c);
       font-weight: 700;
     }
 
@@ -120,8 +120,8 @@ main {
 
       .size {
         font-size: 0.8rem;
-        color: var(--extra-text);
-        background: var(--extra-bg);
+        color: var(--text-c);
+        background: var(--bg-c);
         padding: 0.2rem 0.5rem;
         border-radius: 0.5rem;
         cursor: pointer;
@@ -129,8 +129,8 @@ main {
 
       .active-size {
         font-size: 0.8rem;
-        color: var(--main-bg);
-        background: var(--main-text);
+        color: var(--bg-a);
+        background: var(--text-a);
         padding: 0.2rem 0.5rem;
         border-radius: 0.5rem;
         cursor: pointer;
@@ -145,7 +145,7 @@ main {
       .cart {
         width: 32rem;
         padding: 0.5rem 0;
-        background: var(--extra-bg);
+        background: var(--bg-c);
         border-radius: 0.25rem;
         display: flex;
         justify-content: center;
@@ -164,7 +164,7 @@ main {
 
       .favourite {
         padding: 0.5rem;
-        background: var(--main-text);
+        background: var(--text-a);
         border-radius: 0.25rem;
         cursor: pointer;
 

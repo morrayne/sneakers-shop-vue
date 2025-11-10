@@ -6,8 +6,8 @@ import { ref, onMounted, inject, computed } from 'vue';
 import { supabase } from '../../../helper/supabase';
 
 // imports
-import list_filler from './components/list_filler.vue';
-import list_card_main from './components/list_card_main.vue';
+import list_filler from '../fillers/list_filler.vue';
+import list_card_main from './list_card_main.vue';
 
 // vars
 const sneakers = ref<any[]>([]);
@@ -27,7 +27,7 @@ async function fetchSneakers() {
   } catch (err) {
     console.error("Ошибка загрузки sneakers:", err);
   } finally {
-      loading.value = false;
+    loading.value = false;
   }
 }
 

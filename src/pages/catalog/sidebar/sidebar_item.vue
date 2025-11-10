@@ -34,7 +34,7 @@ function handleClick() { emit('wasClicked', props.val) }
     height: 0.75rem;
     aspect-ratio: 1 / 1;
     border-radius: 0.25rem;
-    background: var(--extra-text);
+    background: var(--text-c);
     opacity: 0.5;
     cursor: pointer;
   }
@@ -49,6 +49,6 @@ function handleClick() { emit('wasClicked', props.val) }
 }
 
 .active {
-  background: var(--extra-bg);
+  background: var(--bg-c);
 }
 </style>

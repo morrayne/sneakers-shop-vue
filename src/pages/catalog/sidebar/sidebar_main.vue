@@ -11,10 +11,10 @@ const props = defineProps<{
 }>();
 
 // components
-import sidebar_main_filter from "./components/sidebar_main_sort.vue";
-import sidebar_main_genders from "./components/sidebar_main_gender.vue";
-import sidebar_main_colors from "./components/sidebar_main_color.vue";
-import sidebar_main_brands from "./components/sidebar_main_brand.vue";
+import sidebar_main_filter from "./options/sidebar_main_sort.vue";
+import sidebar_main_genders from "./options/sidebar_main_gender.vue";
+import sidebar_main_colors from "./options/sidebar_main_color.vue";
+import sidebar_main_brands from "./options/sidebar_main_brand.vue";
 
 // заполнение поисковой строки
 function handleinput(event: Event) {
@@ -34,15 +34,15 @@ function handleinput(event: Event) {
 <style scoped lang="scss">
 .search {
   width: 100%;
-  background: var(--extra-bg);
-  outline: solid 1px var(--extra-bg);
+  background: var(--bg-c);
+  outline: solid 1px var(--bg-c);
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   opacity: 1;
 }:focus {
-    outline: solid 1px var(--main-text);
+    outline: solid 1px var(--text-a);
 }
 ::placeholder {
-  color: var(--extra-text);
+  color: var(--text-c);
 }
 </style>
