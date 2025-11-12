@@ -1,186 +1,118 @@
 <script setup lang="ts">
-// vue
 import { ref } from "vue";
-
-// supabase
-import { supabase } from "../../helper/supabase";
-
-// pinia
 import { useGlobalState } from "../../helper/pinia";
-const global = useGlobalState();
+import { updateUserField } from "../../helper/actions"; // 👈 ключевой импорт
 
-// vars
-const sizes = [
-  "40.0",
-  "40.5",
-  "41.0",
-  "41.5",
-  "42.0",
-  "42.5",
-  "43.0",
-  "43.5",
-  "44.0",
-];
+const global = useGlobalState();
+const props = defineProps<{ data: any }>();
+const emit = defineEmits<{ itemRemoved: [id: number] }>();
+
+const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 const loading = ref(false);
 
-// props
-const props = defineProps<{
-  data: any;
-}>();
-
-// emits
-const emit = defineEmits<{
-  itemRemoved: [id: number];
-}>();
-
-// удаление из избранного
+// 🗑️ удаление из избранного
 async function removeFromFavourite() {
   if (loading.value) return;
-
+  loading.value = true;
   try {
-    loading.value = true;
-
-    // Создаем новый массив без удаляемого элемента
+    const colorName = props.data.colors[props.data.favouriteColor]?.name;
     const updatedFavourites = global.user.favourite.filter(
-      (item: any) =>
-        !(item.id === props.data.id && item.color === props.data.favouriteColor)
+      (item) => !(item.id === props.data.id && item.color === colorName)
     );
 
-    // Обновляем в базе данных
-    const { error } = await supabase
-      .from("profiles")
-      .update({ favourite: updatedFavourites })
-      .eq("id", global.user.id);
-
-    if (error) throw error;
-
-    // Обновляем локальное состояние
+    await updateUserField("favourite", updatedFavourites);
     global.user.favourite = updatedFavourites;
-
-    // Отправляем событие родителю
     emit("itemRemoved", props.data.id);
-
-    console.log("Товар удален из избранного");
-  } catch (error) {
-    console.error("Ошибка при удалении из избранного:", error);
+  } catch (err) {
+    console.error("Ошибка при удалении из избранного:", err);
     alert("Не удалось удалить товар из избранного");
   } finally {
     loading.value = false;
   }
 }
 
-// выбор размера
+// 📏 выбор размера
 async function selectSize(size: string) {
   try {
-    // Создаем обновленный массив с новым размером
-    const updatedFavourites = global.user.favourite.map((item: any) => {
-      if (
-        item.id === props.data.id &&
-        item.color === props.data.favouriteColor
-      ) {
-        return { ...item, size: size };
-      }
-      return item;
-    });
+    const colorName = props.data.colors[props.data.favouriteColor]?.name;
+    const updatedFavourites = global.user.favourite.map((item) =>
+      item.id === props.data.id && item.color === colorName ? { ...item, size } : item
+    );
 
-    // Обновляем в базе данных
-    const { error } = await supabase
-      .from("profiles")
-      .update({ favourite: updatedFavourites })
-      .eq("id", global.user.id);
-
-    if (error) throw error;
-
-    // Обновляем локальное состояние
+    await updateUserField("favourite", updatedFavourites);
     global.user.favourite = updatedFavourites;
-
-    console.log("Размер обновлен:", size);
-  } catch (error) {
-    console.error("Ошибка при обновлении размера:", error);
+  } catch (err) {
+    console.error("Ошибка при обновлении размера:", err);
     alert("Не удалось обновить размер");
   }
 }
 
-// 
+// 🛒 перемещение в корзину
 async function moveToBasket() {
+  if (loading.value) return;
+  loading.value = true;
+
   try {
-    // Добавляем в корзину
-    const basketItem = {
-      id: props.data.id,
-      color: props.data.favouriteColor,
-      size: props.data.favouriteSize || sizes[0] // используем текущий размер или первый по умолчанию
-    };
-    
+    const colorName = props.data.colors[props.data.favouriteColor]?.name || "default";
+    const size = props.data.favouriteSize || sizes[0];
+
+    const basketItem = { id: props.data.id, color: colorName, size };
+
     const updatedBasket = [...global.user.basket, basketItem];
-    
-    // Удаляем из избранного
     const updatedFavourites = global.user.favourite.filter(
-      (item: any) =>
-        !(item.id === props.data.id && item.color === props.data.favouriteColor)
+      (item) => !(item.id === props.data.id && item.color === colorName)
     );
 
-    // Обновляем в базе данных
-    const { error } = await supabase
-      .from("profiles")
-      .update({ 
-        favourite: updatedFavourites,
-        basket: updatedBasket
-      })
-      .eq("id", global.user.id);
+    await updateUserField("basket", updatedBasket);
+    await updateUserField("favourite", updatedFavourites);
 
-    if (error) throw error;
-
-    // Обновляем локальное состояние
-    global.user.favourite = updatedFavourites;
     global.user.basket = updatedBasket;
+    global.user.favourite = updatedFavourites;
 
-    // Отправляем событие родителю
     emit("itemRemoved", props.data.id);
-
-    console.log("Товар перемещен в корзину");
-  } catch (error) {
-    console.error("Ошибка при перемещении в корзину:", error);
+  } catch (err) {
+    console.error("Ошибка при перемещении в корзину:", err);
     alert("Не удалось переместить товар в корзину");
+  } finally {
+    loading.value = false;
   }
 }
-
-setTimeout(() => {
-  console.log(props.data);
-}, 1000);
 </script>
 
 <template>
   <div class="item" v-if="data">
     <div class="img-wrapper">
       <button class="bin" @click="removeFromFavourite" :disabled="loading">
-        <img src="/public/svg/bin.svg" alt="" />
+        <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
-      <div class="tag">{{ data.colors[data.favouriteColor].name }}</div>
+      <div class="tag">{{ data.colors[data.favouriteColor]?.name || "Unknown" }}</div>
       <img
-        :src="`../../../public/sneakers/${data.id}-${
-          data.colors[data.favouriteColor].folder_name
-        }/0.jpg`"
-        alt=""
+        :src="`../../../public/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`"
+        alt="Sneaker"
       />
     </div>
+
     <div class="details">
       <div class="name">{{ data.name }}</div>
+
       <div class="sizes">
         <div
-          :class="{ size: true, active: size === data.favouriteSize }"
           v-for="size in sizes"
           :key="size"
+          :class="{ size: true, active: size === data.favouriteSize }"
           @click="selectSize(size)"
         >
           {{ size }}
         </div>
       </div>
+
       <div class="duo">
         <div class="movetobasket" @click="moveToBasket">Move to basket</div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped lang="scss">
 .item {

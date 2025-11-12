@@ -4,6 +4,7 @@
   <div class="item">
     <div class="img"></div>
     <div class="name"></div>
+    <div class="subb"></div>
     <div class="wrapper">
       <div class="sub" v-for="value in 3" :key="value"></div>
     </div>
@@ -29,7 +30,13 @@
 
   .name {
     width: 80%;
-    height: 3rem;
+    height: 2rem;
+    background: var(--bg-b);
+  }
+
+  .subb {
+     width: 60%;
+    height: 1rem;
     background: var(--bg-b);
   }
 

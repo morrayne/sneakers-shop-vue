@@ -7,7 +7,7 @@ const global = useGlobalState();
 import header_main from "../../common/header/header_main.vue";
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
 import registration_form from "./no_auth/registration_form.vue";
-import left from "./auth/left.vue";
+import left_main from "./auth/left.vue";
 </script>
 
 <template>
@@ -15,7 +15,7 @@ import left from "./auth/left.vue";
     <header_main />
     <main>
       <div class="left" v-if="global.user.id !== 'filler'">
-        <left />
+        <left_main :user="global.user" />
       </div>
       <div :class="global.user.id !== 'filler' ? 'chopped-right' : 'full-right'">
         <registration_form v-if="global.user.id === 'filler'" />

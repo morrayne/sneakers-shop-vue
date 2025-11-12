@@ -9,13 +9,19 @@ export interface user_type {
   history: product_item[];
 }
 
-interface product_item {
+export interface product_item {
   id: number;
-  color: number;
+  color: string;
   size: string;
 }
 
 export interface config_type {
   lang: string;
   theme: string;
+}
+
+export interface sneaker_color {
+  name: string;
+  folder_name: string;
+  [key: string]: any;
 }

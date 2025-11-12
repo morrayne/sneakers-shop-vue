@@ -1,7 +1,12 @@
 <script setup lang="ts">
 // inject
 import { inject } from "vue";
-const { methods } = inject("filterState") as any;
+
+// Получаем filterState один раз
+const filterState = inject("filterState") as any;
+if (!filterState) {
+  throw new Error("filterState is undefined! Проверьте provide в родителе.");
+}
 
 // props
 const props = defineProps<{
@@ -19,7 +24,7 @@ import sidebar_main_brands from "./options/sidebar_main_brand.vue";
 // заполнение поисковой строки
 function handleinput(event: Event) {
   const target = event.target as HTMLInputElement;
-  methods.setSearch(target.value);
+  filterState.methods.setSearch(target.value);
 }
 </script>
 

@@ -1,20 +1,18 @@
 <script setup lang="ts">
-// imports
-import { onMounted } from "vue";
-import { useGlobalState } from "./helper/pinia";
+// vue
+import { onMounted } from "vue"
+
+// supabase / pinia / actions
 import { supabase } from "./helper/supabase";
+import { syncPiniaAndSupabase } from "./helper/actions";
+import { useGlobalState } from "./helper/pinia"
+const global = useGlobalState()
 
-// vars
-const global = useGlobalState();
-
-// сохранение сессии при переходе по ссылкам или тп
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-    if (profileData) Object.assign(global.user, profileData);
-  }
-});
+  const { data: session } = await supabase.auth.getSession()
+  const user = session?.session?.user
+  if (user) await syncPiniaAndSupabase(user.id)
+})
 </script>
 
 <template>

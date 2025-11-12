@@ -24,6 +24,7 @@ const activeColor = computed(() => filterState.state.filters.color);
       :val="item" 
       :display_color="true" 
       :color="item"
+      :direction="false"
       :active="activeColor === item"
       @was-clicked="() => filterState.methods.setFilter('color', item)"
     />

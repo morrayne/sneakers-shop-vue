@@ -1,68 +1,81 @@
 <script setup lang="ts">
 // vue
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 
-// router
+// router / pinia / actions
+import { useGlobalState } from "../../../helper/pinia";
+import { addToBasket, addToFavourites, removeFromFavourites } from "../../../helper/actions";
 import router from "../../../helper/router";
 
-// pinia
-import { useGlobalState } from "../../../helper/pinia";
+const props = defineProps<{ data: any }>();
 const global = useGlobalState();
-
-// vars
 const active_color = ref(0);
 
-// props
-const props = defineProps<{
-  data: any;
-}>();
+onMounted(() => { active_color.value = props.data.displayColor ?? 0 });
 
-// functions
-function navigateToProduct() {
-  router.push(`/product/${props.data.id}`);
-}
-function setActiveColor(val: any, event: Event) {
-  event.stopPropagation(); 
-  active_color.value = val;
-}
+const activeColorData = computed(() => props.data.colors?.[active_color.value]);
 
-// обработчик клика по кнопке цены
-function handlePriceClick(event: Event) {
+const isFavourite = computed(() =>
+  global.user.favourite.some(
+    (f) =>
+      f.id === props.data.id &&
+      f.color === activeColorData.value?.name && // <-- проблема
+      f.size === "42.0"
+  )
+);
+
+function navigateToProduct() { router.push(`/product/${props.data.id}`) }
+
+async function handleAddToBasket(event: Event) {
   event.stopPropagation();
-  if (global.user.id !== 'filler') {
-    console.log('Add to cart:', props.data);
+  try {
+    await addToBasket({
+      id: props.data.id,
+      color: props.data.colors[active_color.value].name,
+      size: "42.0",
+    });
+    alert("Товар успешно добавлен в корзину!");
+  } catch (err: any) {
+    console.error(err);
+    alert("Не удалось добавить товар в корзину");
   }
 }
 
-// монтирование
-onMounted(() => {
-  setActiveColor(props.data.displayColor, new Event('init'));
-});
+async function toggleFavourite(event: Event) {
+  event.stopPropagation();
+  try {
+    const item = {
+      id: props.data.id,
+      color: props.data.colors[active_color.value].name,
+      size: "42.0",
+    };
+
+    if (isFavourite.value) {
+      await removeFromFavourites(item);
+      alert("Удалено из избранного!");
+    } else {
+      await addToFavourites(item);
+      alert("Добавлено в избранное!");
+    }
+  } catch (err: any) {
+    console.error(err);
+    alert("Ошибка при изменении избранного");
+  }
+}
+
+
+function setActiveColor(val: number, event: Event) { event.stopPropagation(); active_color.value = val; }
 </script>
 
 <template>
   <div class="card" @click="navigateToProduct">
     <div class="img-holder">
       <div class="color-wrapper">
-        <button
-          class="color"
-          v-for="(value, index) in props.data.colors"
-          v-if="props.data.colors.length !== 1"
-          :key="value"
-          :style="{ background: value.folder_name }"
-          @click="setActiveColor(index, $event)"
-        ></button>
+        <button v-for="(value, index) in props.data.colors" v-if="props.data.colors.length !== 1" :key="index" class="color" :style="{ background: value.folder_name }" @click="setActiveColor(index, $event)"></button>
         <div class="rating">{{ props.data.rating }} / 100</div>
       </div>
-      <img
-        :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/1.jpg`"
-        alt="product img"
-      />
-      <img
-        :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/0.jpg`"
-        alt="product img"
-        class="dis"
-      />
+      <img v-if="props.data.colors[active_color]" :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/1.jpg`" alt="product img" />
+      <img v-if="props.data.colors[active_color]" :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/0.jpg`" alt="product img" class="dis" />
     </div>
     <p class="name">{{ props.data.name }}</p>
     <p class="sub-name">{{ props.data.colors[active_color].name }}</p>
@@ -70,9 +83,14 @@ onMounted(() => {
       <div class="tag">{{ props.data.brand }}</div>
       <div class="tag">{{ props.data.gender }}</div>
     </div>
-    <button class="btn" :disabled="global.user.id === 'filler'" @click="handlePriceClick">
-      {{ `${props.data.cost} rub` }}
-    </button>
+    <div class="duo">
+      <button class="btn" :disabled="global.user.id === 'filler'" @click="handleAddToBasket">
+        {{ `${props.data.cost} rub` }}
+      </button>
+      <button class="fav" :disabled="global.user.id === 'filler'" @click="toggleFavourite">
+        <img src="/public/svg/heart.svg" :class="{ active: isFavourite }" />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -140,7 +158,7 @@ onMounted(() => {
 
   .sub-name {
     font-size: 0.8rem;
-    color: var(--text-c);
+    color: var(--text-b);
   }
 
   .tags-holder {
@@ -158,17 +176,38 @@ onMounted(() => {
     }
   }
 
-  .btn {
-    text-align: center;
+  .duo {
+    height: 2rem;
     margin-top: 0.25rem;
-    padding: 0.25rem 0;
-    border-radius: 0.5rem;
-    background: var(--text-b);
-    color: var(--bg-a);
-    cursor: pointer;
-  }
-  :disabled {
-    cursor: not-allowed;
+    display: flex;
+    gap: 0.5rem;
+
+    .fav {
+      height: 100%;
+      padding: 0.25rem;
+      background: var(--bg-d);
+      border-radius: 0.5rem;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    } :disabled {
+      cursor: not-allowed;
+    }
+
+    .btn {
+      flex: 1;
+      height: 100%;
+      text-align: center;
+      padding: 0.25rem 0;
+      border-radius: 0.5rem;
+      background: var(--text-b);
+      color: var(--bg-a);
+      cursor: pointer;
+    }
+    :disabled {
+      cursor: not-allowed;
+    }
   }
 }
 </style>

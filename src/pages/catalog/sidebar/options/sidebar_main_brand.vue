@@ -25,13 +25,11 @@ const activeBrand = computed(() => filterState.state.filters.brand);
       :display_color="false"
       :color="'#000'"
       :active="activeBrand === item"
+      :direction="false"
       @was-clicked="() => filterState.methods.setFilter('brand', item)"
     />
   </div>
 </template>
-
-
-<!--  -->
 
 <style scoped lang="scss">
 .filter-holder {

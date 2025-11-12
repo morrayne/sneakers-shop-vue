@@ -19,8 +19,19 @@ const data_array = [
   { name: "cost", val: "cost" },
 ];
 
-// вычисляем активную опцию
+// вычисляем активную опцию и порядок сортировки
 const activeSort = computed(() => filterState.state.sortBy);
+const sortOrder = computed(() => filterState.state.sortOrder);
+
+// Функция для получения направления (только для активной сортировки)
+function getSortDirection(optionVal: string) {
+  if (activeSort.value !== optionVal) return false;
+  return sortOrder.value === "asc" ? "down" : "up";
+}
+
+function handleSortClick(optionVal: string) {
+  filterState.methods.setSortBy(optionVal);
+}
 </script>
 
 <template>
@@ -33,8 +44,9 @@ const activeSort = computed(() => filterState.state.sortBy);
       :val="option.val"
       :display_color="false"
       :color="'#000'"
+      :direction="getSortDirection(option.val)"
       :active="activeSort === option.val"
-      @was-clicked="() => filterState.methods.setSortBy(option.val)"
+      @was-clicked="handleSortClick"
     />
   </div>
 </template>

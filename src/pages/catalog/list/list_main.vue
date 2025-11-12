@@ -40,6 +40,8 @@ onMounted(() => {
 const displayedSneakers = computed(() => {
   let result = [...sneakers.value];
   const f = filterState.state.filters;
+  
+  // Фильтрация (оставляем как есть)
   if (f.color !== 'all') {
     const wanted = f.color;
     result = result.filter(item =>
@@ -60,14 +62,34 @@ const displayedSneakers = computed(() => {
       item.brand.toLowerCase().includes(s)
     );
   }
+  
+  // Сортировка с учетом направления
   const sortKey = filterState.state.sortBy;
+  const sortOrder = filterState.state.sortOrder;
+  
   result.sort((a, b) => {
-    const valA = a[sortKey];
-    const valB = b[sortKey];
-    if (typeof valA === 'number' && typeof valB === 'number') return valA - valB;
-    if (typeof valA === 'string' && typeof valB === 'string') return valA.localeCompare(valB);
+    let valA = a[sortKey];
+    let valB = b[sortKey];
+    
+    // Для числовых значений
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return sortOrder === 'asc' ? valA - valB : valB - valA;
+    }
+    
+    // Для строковых значений
+    if (typeof valA === 'string' && typeof valB === 'string') {
+      return sortOrder === 'asc' 
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    }
+    
+    // Для случаев когда одно значение undefined/null
+    if (valA == null && valB != null) return sortOrder === 'asc' ? -1 : 1;
+    if (valA != null && valB == null) return sortOrder === 'asc' ? 1 : -1;
+    
     return 0;
   });
+  
   return result;
 });
 </script>

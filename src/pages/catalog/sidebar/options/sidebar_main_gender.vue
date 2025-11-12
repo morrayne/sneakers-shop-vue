@@ -24,6 +24,7 @@ const activeGender = computed(() => filterState.state.filters.gender);
       :val="item" 
       :display_color="false" 
       :color="'#000'"
+      :direction="false"
       :active="activeGender === item"
       @was-clicked="() => filterState.methods.setFilter('gender', item)"
     />

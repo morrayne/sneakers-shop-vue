@@ -1,48 +1,44 @@
 <script setup lang="ts">
-// vue
 import { ref } from "vue";
-
-// supabase
-import { supabase } from "../../helper/supabase";
-
-// pinia
 import { useGlobalState } from "../../helper/pinia";
+import { updateUserField } from "../../helper/actions";
+
 const global = useGlobalState();
+
+const props = defineProps<{ data: any }>();
+const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
+
 const loading = ref(false);
 
-// props
-const props = defineProps<{
-  data: any;
-}>();
-
-setTimeout(() => {
-  console.log(props.data);
-}, 2000);
-
-// emits
-const emit = defineEmits<{
-  itemRemoved: [id: number];
-}>();
-
-// удаление из избранного
-async function removeFromFavourite() {
+async function removeFromBasket() {
   if (loading.value) return;
+  loading.value = true;
+
   try {
-    loading.value = true;
-    const updatedFavourites = global.user.basket.filter(
-      (item: any) =>
-        !(item.id === props.data.id && item.color === props.data.favouriteColor)
-    );
-    const { error } = await supabase
-      .from("profiles")
-      .update({ basket: updatedFavourites })
-      .eq("id", global.user.id);
-    if (error) throw error;
-    global.user.basket = updatedFavourites;
-    emit("itemRemoved", props.data.id);
-  } catch (error) {
-    console.error("Ошибка при удалении из избранного:", error);
-    alert("Не удалось удалить товар из избранного");
+    const { id, favouriteColor, favouriteSize, colors } = props.data;
+    const colorName = colors[favouriteColor]?.name;
+
+    const updatedBasket = global.user.basket.filter((item) => {
+      const sameId = item.id === id;
+      const sameSize = item.size === favouriteSize;
+
+      // Приводим item.color к строке заранее — безопасно
+      const itemColorStr =
+        typeof item.color === "number"
+          ? colors[item.color]?.name
+          : (item.color as string);
+
+      return !(sameId && sameSize && itemColorStr === colorName);
+    });
+
+    await updateUserField("basket", updatedBasket);
+    global.user.basket = updatedBasket;
+
+    emit("item-removed", id, favouriteColor, favouriteSize);
+    console.log("✅ Удалено:", id, colorName, favouriteSize);
+  } catch (err: any) {
+    console.error("❌ Ошибка при удалении:", err.message ?? err);
+    alert("Не удалось удалить товар");
   } finally {
     loading.value = false;
   }
@@ -52,27 +48,24 @@ async function removeFromFavourite() {
 <template>
   <div class="item" v-if="data">
     <div class="img-wrapper">
-      <div class="sdf">
-        <div class="stag">{{ data.colors[data.favouriteColor].name }}</div>
-      </div>
-      <button class="bin" @click="removeFromFavourite" :disabled="loading">
-        <img src="/svg/bin.svg" alt="Удалить" />
+      <button class="bin" @click="removeFromBasket" :disabled="loading">
+        <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
-      <div class="tag">{{ data.colors[data.favouriteColor].name }}</div>
+      <div class="tag">{{ data.colors[data.favouriteColor]?.name }}</div>
       <img
-        :src="`/sneakers/${data.id}-${
-          data.colors[data.favouriteColor].folder_name
-        }/0.jpg`"
+        :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name}/0.jpg`"
         :alt="data.name"
       />
     </div>
-    <div class="name">{{ data.name }}</div>
-    <div class="stags">
-      <div class="stag">{{ data.gender }}</div>
-      <div class="stag">{{ data.favouriteSize }}</div>
-      <div class="stag">{{ data.rating }} / 100</div>
+    <div class="details">
+      <div class="name">{{ data.name }}</div>
+      <div class="stags">
+        <div class="stag">{{ data.gender }}</div>
+        <div class="stag">{{ data.favouriteSize }}</div>
+        <div class="stag">{{ data.rating }} / 100</div>
+      </div>
+      <div class="movetobasket">{{ data.cost }} rub</div>
     </div>
-    <div class="movetobasket">{{ data.cost }} rub</div>
   </div>
 </template>
 
