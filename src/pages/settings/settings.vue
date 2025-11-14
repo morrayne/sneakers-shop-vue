@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // pinia
-import { useGlobalState } from "../../helper/pinia";
-const global = useGlobalState();
+// import { useGlobalState } from "../../helper/pinia";
+// const global = useGlobalState();
 
 // components
 import header_main from "../../common/header/header_main.vue";
