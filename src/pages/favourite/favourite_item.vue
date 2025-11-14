@@ -76,7 +76,7 @@ async function moveToBasket() {
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
       <div class="tag">{{ data.colors[data.favouriteColor]?.name || "Unknown" }}</div>
-      <img :src="`../../../public/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`" alt="Sneaker" />
+      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`" alt="Sneaker" />
     </div>
     <div class="details">
       <div class="name">{{ data.name }}</div>

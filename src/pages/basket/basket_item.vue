@@ -47,7 +47,7 @@ async function removeFromBasket() {
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
       <div class="tag">{{ data.colors[data.favouriteColor]?.name }}</div>
-      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name}/0.jpg`" :alt="data.name" />
+      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor].folder_name}/0.jpg`" :alt="data.name" />
     </div>
     <div class="details">
       <div class="name">{{ data.name }}</div>
