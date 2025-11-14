@@ -1,12 +1,9 @@
 <script setup lang="ts">
-// inject
+// vue
 import { inject } from "vue";
 
-// Получаем filterState один раз
+// filterState получается через inject
 const filterState = inject("filterState") as any;
-if (!filterState) {
-  throw new Error("filterState is undefined! Проверьте provide в родителе.");
-}
 
 // props
 const props = defineProps<{

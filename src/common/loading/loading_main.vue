@@ -1,13 +1,11 @@
+<script setup lang="ts"></script>
+
 <template>
   <div class="loading-wrapper">
     <div class="spinner"></div>
-    <p>Loading...</p>
+    <p>Loading in progress</p>
   </div>
 </template>
-
-<script setup lang="ts">
-// Здесь нет никакой логики
-</script>
 
 <style scoped lang="scss">
 .loading-wrapper {
@@ -22,10 +20,9 @@
 
 .loading-wrapper p {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-a);
 }
 
-/* Спиннер */
 .spinner {
   width: 80px;
   height: 80px;
@@ -35,7 +32,6 @@
   animation: spin 1s linear infinite;
 }
 
-/* Анимация */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

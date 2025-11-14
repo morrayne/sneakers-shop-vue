@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// vue
 import { ref, onMounted, watch } from "vue";
 
 // types
@@ -13,7 +14,6 @@ import favourite_item from "./favourite_item.vue";
 // pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
 import { supabase } from "../../helper/supabase";
-
 const global = useGlobalState();
 
 // state
@@ -28,35 +28,23 @@ async function fetchFavs() {
     loading.value = false;
     return;
   }
-
   loading.value = true;
   error.value = null;
-
   try {
-    const { data, error: supabaseError } = await supabase
-      .from("sneakers")
-      .select("*");
+    const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
     if (supabaseError) throw supabaseError;
-
     const sneakersMap = new Map<number, any>();
     data?.forEach((item) => sneakersMap.set(item.id, item));
-
-    fav_array.value = global.user.favourite
-      .map((fav) => {
-        const sneaker = sneakersMap.get(fav.id);
-        if (!sneaker) return null;
-
-        const colorIndex = (sneaker.colors as sneaker_color[]).findIndex(
-          (c: sneaker_color) => c.name === fav.color
-        );
-
-        return {
-          ...sneaker,
-          favouriteColor: colorIndex >= 0 ? colorIndex : 0,
-          favouriteSize: fav.size,
-        };
-      })
-      .filter(Boolean);
+    fav_array.value = global.user.favourite.map((fav) => {
+      const sneaker = sneakersMap.get(fav.id);
+      if (!sneaker) return null;
+      const colorIndex = (sneaker.colors as sneaker_color[]).findIndex((c: sneaker_color) => c.name === fav.color);
+      return {
+        ...sneaker,
+        favouriteColor: colorIndex >= 0 ? colorIndex : 0,
+        favouriteSize: fav.size,
+      };
+    }).filter(Boolean);
   } catch (err: any) {
     console.error("Ошибка загрузки избранного:", err);
     error.value = err.message ?? String(err);
@@ -65,17 +53,13 @@ async function fetchFavs() {
   }
 }
 
-// обработчик удаления элемента
+// удаление элемента
 function handleItemRemoved(itemId: number) {
   fav_array.value = fav_array.value.filter((item) => item.id !== itemId);
 }
 
 // следим за изменением пользователя или избранного
-watch(
-  () => [global.user.id, global.user.favourite],
-  () => fetchFavs(),
-  { deep: true }
-);
+watch(() => [global.user.id, global.user.favourite], () => fetchFavs(), { deep: true });
 
 // монтирование
 onMounted(fetchFavs);
@@ -88,15 +72,7 @@ onMounted(fetchFavs);
       <div v-if="loading" class="loa">
         <loading_main />
       </div>
-
-      <favourite_item
-        v-else
-        v-for="item in fav_array"
-        :key="`${item.id}-${item.favouriteColor}`"
-        :data="item"
-        @item-removed="handleItemRemoved"
-      />
-
+      <favourite_item v-else v-for="item in fav_array" :key="`${item.id}-${item.favouriteColor}`" :data="item" @item-removed="handleItemRemoved" />
       <div v-if="!loading && fav_array.length === 0" class="loa">
         <img src="/public/gif/evernight.gif" alt="No items" />
         <p v-if="global.user.id !== 'filler'">No sneakers in favourite</p>

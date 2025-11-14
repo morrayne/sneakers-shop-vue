@@ -45,7 +45,7 @@ const color_array = reactive<string[]>([]);
 const brand_array = reactive<string[]>([]);
 const gender_array = reactive<string[]>([]);
 
-// search / sort / filter
+// search & sort & filter
 const everything = reactive({
   search: "",
   sortBy: "id",
@@ -77,14 +77,11 @@ function setSortBy(sortBy: string) {
 function setSortOrder(order: "asc" | "desc") { everything.sortOrder = order; }
 function setFilter(type: "color" | "gender" | "brand", value: string) { everything.filters[type] = value; }
 
+// монтирование
 onMounted(() => initializeData());
 
 // provide для sidebar и list
-provide("filterState", {
-  state: everything,
-  arrays: { colors: color_array, brands: brand_array, genders: gender_array },
-  methods: { setSearch, setSortBy, setSortOrder, setFilter },
-});
+provide("filterState", {state: everything, arrays: { colors: color_array, brands: brand_array, genders: gender_array }, methods: { setSearch, setSortBy, setSortOrder, setFilter }});
 </script>
 
 <template>

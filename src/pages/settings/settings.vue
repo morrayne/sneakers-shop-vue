@@ -11,7 +11,9 @@ import wrapper_main from "../../common/wrapper/wrapper_main.vue";
 <template>
   <wrapper_main>
     <header_main />
-    <main></main>
+    <main>
+      in development
+    </main>
   </wrapper_main>
 </template>
 

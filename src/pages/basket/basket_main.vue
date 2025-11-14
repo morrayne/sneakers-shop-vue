@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// vue
 import { ref, onMounted, watch } from "vue";
 
 // components
@@ -16,7 +17,7 @@ const global = useGlobalState();
 import { updateUserField } from "../../helper/actions";
 import type { sneaker_color } from "../../helper/types";
 
-// state
+// vars
 const basket_array = ref<any[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -31,29 +32,20 @@ async function fetchBasket() {
   loading.value = true;
   error.value = null;
   try {
-    const { data: sneakers, error: supabaseError } = await supabase
-      .from("sneakers")
-      .select("*");
+    const { data: sneakers, error: supabaseError } = await supabase.from("sneakers").select("*");
     if (supabaseError) throw supabaseError;
     const sneakersMap = new Map<number, any>();
     sneakers?.forEach((item) => sneakersMap.set(item.id, item));
-    basket_array.value = global.user.basket
-      .map((basketItem) => {
-        const sneaker = sneakersMap.get(basketItem.id);
-        if (!sneaker) return null;
-        const colorIndex =
-          typeof basketItem.color === "number"
-            ? basketItem.color
-            : (sneaker.colors as sneaker_color[]).findIndex(
-                (c) => c.name === basketItem.color
-              );
-        return {
-          ...sneaker,
-          favouriteColor: colorIndex,
-          favouriteSize: basketItem.size,
-        };
-      })
-      .filter(Boolean);
+    basket_array.value = global.user.basket.map((basketItem) => {
+      const sneaker = sneakersMap.get(basketItem.id);
+      if (!sneaker) return null;
+      const colorIndex = typeof basketItem.color === "number" ? basketItem.color : (sneaker.colors as sneaker_color[]).findIndex((c) => c.name === basketItem.color);
+      return {
+        ...sneaker,
+        favouriteColor: colorIndex,
+        favouriteSize: basketItem.size,
+      }}
+    ).filter(Boolean);
   } catch (err: any) {
     console.error("Ошибка загрузки корзины:", err);
     error.value = err.message;
@@ -62,7 +54,7 @@ async function fetchBasket() {
   }
 }
 
-// обработчик удаления элемента
+// удаления элемента
 async function handleItemRemoved(itemId: number, colorIndex: number, size: string) {
   const updatedBasket = global.user.basket.filter((item) => {
     const sameId = item.id === itemId;
@@ -70,18 +62,9 @@ async function handleItemRemoved(itemId: number, colorIndex: number, size: strin
     const sameColor = String(item.color) === String(colorIndex);
     return !(sameId && sameColor && sameSize);
   });
-
   await updateUserField("basket", updatedBasket);
   global.user.basket = updatedBasket;
-
-  // просто убираем товар локально — без перезагрузки корзины
-  basket_array.value = basket_array.value.filter(
-    (item) =>
-      item.id !== itemId ||
-      item.favouriteColor !== colorIndex ||
-      item.favouriteSize !== size
-  );
-
+  basket_array.value = basket_array.value.filter((item) => item.id !== itemId || item.favouriteColor !== colorIndex || item.favouriteSize !== size);
   console.log("🗑️ Удалено из корзины:", itemId, colorIndex, size);
 }
 
@@ -92,7 +75,6 @@ onMounted(fetchBasket);
 watch(() => global.user.id, fetchBasket);
 </script>
 
-<!-- prettier-ignoref -->
 <template>
   <wrapper_main>
     <header_main />
@@ -101,13 +83,7 @@ watch(() => global.user.id, fetchBasket);
         <div v-if="loading" class="loa">
           <loading_main />
         </div>
-        <basket_item
-          v-else
-          v-for="item in basket_array"
-          :key="`${item.id}-${item.favouriteColor}`"
-          :data="item"
-          @item-removed="handleItemRemoved"
-        />
+        <basket_item v-else v-for="item in basket_array" :key="`${item.id}-${item.favouriteColor}`" :data="item" @item-removed="handleItemRemoved" />
         <div v-if="!loading && basket_array.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
           <p v-if="global.user.id !== 'filler'">No sneakers in basket</p>
@@ -122,8 +98,7 @@ watch(() => global.user.id, fetchBasket);
           <div class="cost">{{ value.cost }} rub</div>
         </div>
         <div class="finalcost">
-          {{ basket_array.reduce((sum, item) => sum + (item.cost || 0), 0) }}
-          rub
+          {{ basket_array.reduce((sum, item) => sum + (item.cost || 0), 0) }} rub
         </div>
       </div>
     </main>

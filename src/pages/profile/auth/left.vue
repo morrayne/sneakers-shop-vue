@@ -1,14 +1,14 @@
 <script setup lang="ts">
+// pinia & actions
 import { logoutUser } from "../../../helper/actions"
 import { useGlobalState } from "../../../helper/pinia"
-
 const global = useGlobalState()
 </script>
 
 <template>
   <div class="prof">
     <img :src="`/profile/${global.user.icon}.jpg`" alt="user icon" />
-    <div class="id">{{ global.user.name || global.user.email }}</div>
+    <div class="id">{{ global.user.id }}</div>
     <button class="log-out" @click="logoutUser">Log Out</button>
   </div>
 </template>

@@ -36,60 +36,35 @@ onMounted(() => {
   fetchSneakers();
 });
 
-// вычисляемый массив с фильтрацией/поиском/сортировкой
+// вычисляемый массив с фильтрацией & поиском & сортировкой
 const displayedSneakers = computed(() => {
   let result = [...sneakers.value];
   const f = filterState.state.filters;
-  
-  // Фильтрация (оставляем как есть)
   if (f.color !== 'all') {
     const wanted = f.color;
-    result = result.filter(item =>
-      Array.isArray(item.colors) &&
-      item.colors.some((c: any) => (c?.folder_name ?? c) === wanted)
-    );
+    result = result.filter(item => Array.isArray(item.colors) && item.colors.some((c: any) => (c?.folder_name ?? c) === wanted));
   }
-  if (f.brand !== 'all') {
-    result = result.filter(item => item.brand === f.brand);
-  }
-  if (f.gender !== 'all') {
-    result = result.filter(item => item.gender === f.gender);
-  }
+  if (f.brand !== 'all') { result = result.filter(item => item.brand === f.brand) }
+  if (f.gender !== 'all') { result = result.filter(item => item.gender === f.gender) }
   if (filterState.state.search) {
     const s = filterState.state.search.toLowerCase();
-    result = result.filter(item =>
-      item.name.toLowerCase().includes(s) ||
-      item.brand.toLowerCase().includes(s)
-    );
+    result = result.filter(item => item.name.toLowerCase().includes(s) || item.brand.toLowerCase().includes(s));
   }
-  
-  // Сортировка с учетом направления
+  // учет направления при сортировке
   const sortKey = filterState.state.sortBy;
   const sortOrder = filterState.state.sortOrder;
-  
   result.sort((a, b) => {
     let valA = a[sortKey];
     let valB = b[sortKey];
-    
-    // Для числовых значений
-    if (typeof valA === 'number' && typeof valB === 'number') {
-      return sortOrder === 'asc' ? valA - valB : valB - valA;
-    }
-    
-    // Для строковых значений
-    if (typeof valA === 'string' && typeof valB === 'string') {
-      return sortOrder === 'asc' 
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    }
-    
-    // Для случаев когда одно значение undefined/null
+    // числовые значения
+    if (typeof valA === 'number' && typeof valB === 'number') { return sortOrder === 'asc' ? valA - valB : valB - valA }
+    // строковые значений
+    if (typeof valA === 'string' && typeof valB === 'string') { return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA) }
+    // обработка undefined или null
     if (valA == null && valB != null) return sortOrder === 'asc' ? -1 : 1;
     if (valA != null && valB == null) return sortOrder === 'asc' ? 1 : -1;
-    
     return 0;
   });
-  
   return result;
 });
 </script>

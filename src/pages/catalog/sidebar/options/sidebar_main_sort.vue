@@ -1,15 +1,14 @@
 <script setup lang="ts">
+// vue
 import { inject, computed } from "vue";
+
+// components
 import sidebar_item from "../sidebar_item.vue";
 
-// filterState через inject
+// filterState получается через inject
 const filterState = inject("filterState") as any;
 
-if (!filterState) {
-  throw new Error("filterState is undefined! Проверьте provide в родителе.");
-}
-
-// массив опций сортировки
+// массив вариантов сортировки
 const data_array = [
   { name: "appearence date", val: "id" },
   { name: "name", val: "name" },
@@ -19,7 +18,7 @@ const data_array = [
   { name: "cost", val: "cost" },
 ];
 
-// вычисляем активную опцию и порядок сортировки
+// vars
 const activeSort = computed(() => filterState.state.sortBy);
 const sortOrder = computed(() => filterState.state.sortOrder);
 
@@ -28,7 +27,6 @@ function getSortDirection(optionVal: string) {
   if (activeSort.value !== optionVal) return false;
   return sortOrder.value === "asc" ? "down" : "up";
 }
-
 function handleSortClick(optionVal: string) {
   filterState.methods.setSortBy(optionVal);
 }
@@ -37,17 +35,7 @@ function handleSortClick(optionVal: string) {
 <template>
   <div class="filter-holder">
     <div class="size">Sort by</div>
-    <sidebar_item
-      v-for="option in data_array"
-      :key="option.val"
-      :name="option.name"
-      :val="option.val"
-      :display_color="false"
-      :color="'#000'"
-      :direction="getSortDirection(option.val)"
-      :active="activeSort === option.val"
-      @was-clicked="handleSortClick"
-    />
+    <sidebar_item v-for="option in data_array" :key="option.val" :name="option.name" :val="option.val" :display_color="false" :color="'#000'" :direction="getSortDirection(option.val)" :active="activeSort === option.val" @was-clicked="handleSortClick" />
   </div>
 </template>
 

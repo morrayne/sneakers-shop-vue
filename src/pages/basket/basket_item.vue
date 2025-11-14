@@ -1,39 +1,34 @@
 <script setup lang="ts">
+// vue
 import { ref } from "vue";
+
+// pinia 
 import { useGlobalState } from "../../helper/pinia";
 import { updateUserField } from "../../helper/actions";
-
 const global = useGlobalState();
 
+// props & emits
 const props = defineProps<{ data: any }>();
 const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
 
+// vars
 const loading = ref(false);
 
+// функция удаления из корзины
 async function removeFromBasket() {
   if (loading.value) return;
   loading.value = true;
-
   try {
     const { id, favouriteColor, favouriteSize, colors } = props.data;
     const colorName = colors[favouriteColor]?.name;
-
     const updatedBasket = global.user.basket.filter((item) => {
       const sameId = item.id === id;
       const sameSize = item.size === favouriteSize;
-
-      // Приводим item.color к строке заранее — безопасно
-      const itemColorStr =
-        typeof item.color === "number"
-          ? colors[item.color]?.name
-          : (item.color as string);
-
+      const itemColorStr = typeof item.color === "number" ? colors[item.color].name : (item.color as string);
       return !(sameId && sameSize && itemColorStr === colorName);
     });
-
     await updateUserField("basket", updatedBasket);
     global.user.basket = updatedBasket;
-
     emit("item-removed", id, favouriteColor, favouriteSize);
     console.log("✅ Удалено:", id, colorName, favouriteSize);
   } catch (err: any) {
@@ -52,10 +47,7 @@ async function removeFromBasket() {
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
       <div class="tag">{{ data.colors[data.favouriteColor]?.name }}</div>
-      <img
-        :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name}/0.jpg`"
-        :alt="data.name"
-      />
+      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name}/0.jpg`" :alt="data.name" />
     </div>
     <div class="details">
       <div class="name">{{ data.name }}</div>

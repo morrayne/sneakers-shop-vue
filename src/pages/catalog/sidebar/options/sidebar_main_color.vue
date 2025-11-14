@@ -1,16 +1,18 @@
 <script setup lang="ts">
-// inject
+// vue
 import { inject, computed } from "vue";
+
+// components
 import sidebar_item from "../sidebar_item.vue";
 
-// filterState через inject
+// filterState получается через inject
 const filterState = inject("filterState") as any;
 if (!filterState) { throw new Error("filterState is undefined! Проверьте provide в родителе.") }
 
 // props
 const props = defineProps<{ data_array: string[] }>();
 
-// вычисляем активный цвет
+// активный цвет
 const activeColor = computed(() => filterState.state.filters.color);
 </script>
 

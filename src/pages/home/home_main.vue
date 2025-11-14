@@ -6,5 +6,8 @@ import wrapper_home from "../../common/wrapper/wrapper_home.vue";
 <template>
   <wrapper_home>
     <header_home/>
+    <main>
+      in development
+    </main>
   </wrapper_home>
 </template>

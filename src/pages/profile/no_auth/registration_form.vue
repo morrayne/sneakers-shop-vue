@@ -1,7 +1,11 @@
 <script setup lang="ts">
+// vue
 import { reactive, ref } from "vue"
+
+// actions
 import { loginUser, registerUser } from "../../../helper/actions"
 
+// vars
 const mode = ref<"login" | "register">("login")
 const data = reactive({
   email: "",
@@ -10,16 +14,12 @@ const data = reactive({
   icon: 1,
 })
 
+// регистрация
 async function handleSubmit(e: Event) {
   e.preventDefault()
   try {
     if (mode.value === "register") {
-      await registerUser({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-        icon: data.icon - 1,
-      })
+      await registerUser({ email: data.email, password: data.password, name: data.name, icon: data.icon - 1 })
     } else {
       await loginUser(data.email, data.password)
     }
@@ -28,9 +28,8 @@ async function handleSubmit(e: Event) {
   }
 }
 
-function toggleMode() {
-  mode.value = mode.value === "login" ? "register" : "login"
-}
+// режим регистрации или авторизации
+function toggleMode() { mode.value = mode.value === "login" ? "register" : "login" }
 </script>
 
 <template>

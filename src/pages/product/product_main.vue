@@ -1,33 +1,24 @@
-<!-- prettier-ignore -->
 <script setup lang="ts">
 // vue
 import { ref, reactive, onMounted, watch } from "vue";
 
-// pinia
+// pinia & supabase & router
 import { useGlobalState } from "../../helper/pinia";
 const global = useGlobalState();
-
-// supabase
 import { supabase } from "../../helper/supabase";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 // components
 import header_main from "../../common/header/header_main.vue";
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
 import product_filler from "./product_filler.vue";
 
-// router
-import { useRoute } from "vue-router";
-const route = useRoute();
-
 // vars
 const loading = ref(true);
 const productId = ref<string>("");
 const product = ref<any>(null);
-const selected = reactive({
-  main_photo: 0,
-  color: 0,
-  size: "40.0",
-});
+const selected = reactive({ main_photo: 0, color: 0, size: "40.0" });
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 
 // Получаем текущий товар
@@ -52,31 +43,19 @@ watch(() => route.params.id, (newId) => {
   fetchProduct();
 });
 
-// добваление в избранное
+// добавление в избранное
 async function addToFavourite(user_id: string, product_id: number) {
   if (!user_id || user_id === "filler") return;
   try {
     const { data: userData, error: fetchError } = await supabase.from("profiles").select("favourite").eq("id", user_id).single();
     if (fetchError) throw fetchError;
     const current = userData?.favourite ?? [];
-    const exists = current.some(
-      (item: any) =>
-        item.id === product_id &&
-        item.color === selected.color &&
-        item.size === selected.size
-    );
-    const updated = exists
-      ? current.filter(
-          (item: any) =>
-            !(
-              item.id === product_id &&
-              item.color === selected.color &&
-              item.size === selected.size
-            )
-        )
-      : [...current, { id: product_id, color: selected.color, size: selected.size }];
-    const { data: updatedData, error: updateError } = await supabase.from("profiles").update({ favourite: updated }).eq("id", user_id).select();
+    const colorName = product.value.colors[selected.color].name;
+    const exists = current.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
+    const updated = exists? current.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...current, { id: product_id, color: colorName, size: selected.size }];
+    const { error: updateError } = await supabase.from("profiles").update({ favourite: updated }).eq("id", user_id).select();
     if (updateError) throw updateError;
+    global.user.favourite = updated;
   } catch (err) {
     console.error("Ошибка при обновлении избранного:", err);
   }
@@ -89,29 +68,18 @@ async function addToBasket(user_id: string, product_id: number) {
     const { data: userData, error: fetchError } = await supabase.from("profiles").select("basket").eq("id", user_id).single();
     if (fetchError) throw fetchError;
     const current = userData?.basket ?? [];
-    const exists = current.some(
-      (item: any) =>
-        item.id === product_id &&
-        item.color === selected.color &&
-        item.size === selected.size
-    );
-    const updated = exists? current.filter(
-          (item: any) =>
-            !(
-              item.id === product_id &&
-              item.color === selected.color &&
-              item.size === selected.size
-            )
-        )
-      : [...current, { id: product_id, color: selected.color, size: selected.size }];
-    const { data: updatedData, error: updateError } = await supabase.from("profiles").update({ basket: updated }).eq("id", user_id).select();
+    const colorName = product.value.colors[selected.color].name;
+    const exists = current.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
+    const updated = exists ? current.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...current, { id: product_id, color: colorName, size: selected.size }];
+    const { error: updateError } = await supabase.from("profiles").update({ basket: updated }).eq("id", user_id).select();
     if (updateError) throw updateError;
+    global.user.basket = updated;
   } catch (err) {
     console.error("Ошибка при обновлении корзины:", err);
   }
 }
 
-// Восстановление пользователя после F5
+// восстановление сессии при f5
 onMounted(async () => {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.user) {
@@ -123,7 +91,6 @@ onMounted(async () => {
 });
 </script>
 
-<!-- prettier-ignore -->
 <template>
   <wrapper_main>
     <header_main />

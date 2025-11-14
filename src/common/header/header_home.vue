@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// pinia globals state
+// pinia
 import { useGlobalState } from "../../helper/pinia";
 const global = useGlobalState();
 </script>

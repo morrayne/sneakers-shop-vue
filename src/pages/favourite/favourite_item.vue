@@ -1,44 +1,42 @@
 <script setup lang="ts">
+// vue
 import { ref } from "vue";
-import { useGlobalState } from "../../helper/pinia";
-import { updateUserField } from "../../helper/actions"; // 👈 ключевой импорт
 
+// pinia & actions
+import { useGlobalState } from "../../helper/pinia";
+import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
+
+// props
 const props = defineProps<{ data: any }>();
+
+// emits
 const emit = defineEmits<{ itemRemoved: [id: number] }>();
 
+// vars
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 const loading = ref(false);
 
-// 🗑️ удаление из избранного
+// удаление из избранного
 async function removeFromFavourite() {
   if (loading.value) return;
-  loading.value = true;
   try {
-    const colorName = props.data.colors[props.data.favouriteColor]?.name;
-    const updatedFavourites = global.user.favourite.filter(
-      (item) => !(item.id === props.data.id && item.color === colorName)
-    );
-
+    const colorName = props.data.colors[props.data.favouriteColor].name;
+    const updatedFavourites = global.user.favourite.filter((item) => !(item.id === props.data.id && item.color === colorName));
     await updateUserField("favourite", updatedFavourites);
     global.user.favourite = updatedFavourites;
     emit("itemRemoved", props.data.id);
   } catch (err) {
     console.error("Ошибка при удалении из избранного:", err);
     alert("Не удалось удалить товар из избранного");
-  } finally {
-    loading.value = false;
   }
 }
 
-// 📏 выбор размера
+// перевыбор размера
 async function selectSize(size: string) {
   try {
     const colorName = props.data.colors[props.data.favouriteColor]?.name;
-    const updatedFavourites = global.user.favourite.map((item) =>
-      item.id === props.data.id && item.color === colorName ? { ...item, size } : item
-    );
-
+    const updatedFavourites = global.user.favourite.map((item) => item.id === props.data.id && item.color === colorName ? { ...item, size } : item);
     await updateUserField("favourite", updatedFavourites);
     global.user.favourite = updatedFavourites;
   } catch (err) {
@@ -47,28 +45,20 @@ async function selectSize(size: string) {
   }
 }
 
-// 🛒 перемещение в корзину
+// перемещение в корзину
 async function moveToBasket() {
   if (loading.value) return;
   loading.value = true;
-
   try {
     const colorName = props.data.colors[props.data.favouriteColor]?.name || "default";
     const size = props.data.favouriteSize || sizes[0];
-
     const basketItem = { id: props.data.id, color: colorName, size };
-
     const updatedBasket = [...global.user.basket, basketItem];
-    const updatedFavourites = global.user.favourite.filter(
-      (item) => !(item.id === props.data.id && item.color === colorName)
-    );
-
+    const updatedFavourites = global.user.favourite.filter((item) => !(item.id === props.data.id && item.color === colorName));
     await updateUserField("basket", updatedBasket);
     await updateUserField("favourite", updatedFavourites);
-
     global.user.basket = updatedBasket;
     global.user.favourite = updatedFavourites;
-
     emit("itemRemoved", props.data.id);
   } catch (err) {
     console.error("Ошибка при перемещении в корзину:", err);
@@ -86,33 +76,21 @@ async function moveToBasket() {
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
       <div class="tag">{{ data.colors[data.favouriteColor]?.name || "Unknown" }}</div>
-      <img
-        :src="`../../../public/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`"
-        alt="Sneaker"
-      />
+      <img :src="`../../../public/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`" alt="Sneaker" />
     </div>
-
     <div class="details">
       <div class="name">{{ data.name }}</div>
-
       <div class="sizes">
-        <div
-          v-for="size in sizes"
-          :key="size"
-          :class="{ size: true, active: size === data.favouriteSize }"
-          @click="selectSize(size)"
-        >
+        <div v-for="size in sizes" :key="size" :class="{ size: true, active: size === data.favouriteSize }" @click="selectSize(size)">
           {{ size }}
         </div>
       </div>
-
       <div class="duo">
         <div class="movetobasket" @click="moveToBasket">Move to basket</div>
       </div>
     </div>
   </div>
 </template>
-
 
 <style scoped lang="scss">
 .item {

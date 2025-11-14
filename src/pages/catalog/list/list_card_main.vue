@@ -2,30 +2,25 @@
 // vue
 import { ref, computed, onMounted } from "vue";
 
-// router / pinia / actions
+// router & pinia
 import { useGlobalState } from "../../../helper/pinia";
+const global = useGlobalState();
 import { addToBasket, addToFavourites, removeFromFavourites } from "../../../helper/actions";
 import router from "../../../helper/router";
+function navigateToProduct() { router.push(`/product/${props.data.id}`) };
 
+// props
 const props = defineProps<{ data: any }>();
-const global = useGlobalState();
 const active_color = ref(0);
 
+// монтирование
 onMounted(() => { active_color.value = props.data.displayColor ?? 0 });
 
+// vars
 const activeColorData = computed(() => props.data.colors?.[active_color.value]);
+const isFavourite = computed(() => global.user.favourite.some((f) => f.id === props.data.id && f.color === activeColorData.value?.name && f.size === "42.0"));
 
-const isFavourite = computed(() =>
-  global.user.favourite.some(
-    (f) =>
-      f.id === props.data.id &&
-      f.color === activeColorData.value?.name && // <-- проблема
-      f.size === "42.0"
-  )
-);
-
-function navigateToProduct() { router.push(`/product/${props.data.id}`) }
-
+// добавление в корзину
 async function handleAddToBasket(event: Event) {
   event.stopPropagation();
   try {
@@ -41,6 +36,7 @@ async function handleAddToBasket(event: Event) {
   }
 }
 
+// добавление в избранное
 async function toggleFavourite(event: Event) {
   event.stopPropagation();
   try {
@@ -49,7 +45,6 @@ async function toggleFavourite(event: Event) {
       color: props.data.colors[active_color.value].name,
       size: "42.0",
     };
-
     if (isFavourite.value) {
       await removeFromFavourites(item);
       alert("Удалено из избранного!");
@@ -63,7 +58,7 @@ async function toggleFavourite(event: Event) {
   }
 }
 
-
+// смена выбранного цвета
 function setActiveColor(val: number, event: Event) { event.stopPropagation(); active_color.value = val; }
 </script>
 

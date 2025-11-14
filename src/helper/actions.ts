@@ -40,7 +40,7 @@ export async function logoutUser() {
   const global = useGlobalState();
   const { error } = await supabase.auth.signOut();
   global.clearUser();
-  if (error) console.warn("⚠ Ошибка при выходе:", error.message);
+  if (error) console.warn("Ошибка при выходе:", error.message);
   else console.log("✅ Выход выполнен");
 }
 
@@ -109,12 +109,12 @@ export async function updateUserField(field: UpdatableFields, value: any[]) {
     console.log("📤 Обновление профиля:", { id: global.user.id, field, value });
     const { data, error } = await supabase.from("profiles").update({ [field]: value }).eq("id", global.user.id).select();
     if (error) throw error;
-    if (!data?.length) throw new Error("⚠️ Запрос выполнен, но строка не найдена (проверь RLS или id)");
+    if (!data?.length) throw new Error("Запрос выполнен, но строка не найдена (надо проверить supabase RLS или id)");
     (global.user as any)[field] = [...value];
     console.log(`✅ Поле "${field}" обновлено`, data[0]);
     return data[0];
   } catch (err: any) {
-    console.error(`❌ Ошибка обновления поля "${field}":`, err.message ?? err);
+    console.error(`Ошибка обновления поля "${field}":`, err.message ?? err);
     throw err;
   }
 }

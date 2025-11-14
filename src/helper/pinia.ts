@@ -22,19 +22,12 @@ export const useGlobalState = defineStore("global", {
       theme: "light",
     } as config_type,
   }),
-
   actions: {
     // установка данных пользователя (например, после логина/регистрации)
-    setUser(newUser: user_type) {
-      this.user = { ...newUser };
-    },
+    setUser(newUser: user_type) { this.user = { ...newUser } },
     // очистка данных при выходе из аккаунта
-    clearUser() {
-      this.user = { ...fillerUser };
-    },
+    clearUser() { this.user = { ...fillerUser } },
     // обновление отдельного поля пользователя (локально)
-    updateUserField<K extends keyof user_type>(field: K, value: user_type[K]) {
-      this.user[field] = value;
-    },
+    updateUserField<K extends keyof user_type>(field: K, value: user_type[K]) { this.user[field] = value },
   },
 });
