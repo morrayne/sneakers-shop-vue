@@ -3,7 +3,7 @@
 import { ref, onMounted, watch } from "vue";
 
 // types
-import type { sneaker_color } from "../../helper/types";
+import type { product_item } from "../../helper/types";
 
 // components
 import loading_main from "../../common/loading/loading_main.vue";
@@ -13,38 +13,22 @@ import favourite_item from "./favourite_item.vue";
 
 // pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
-import { supabase } from "../../helper/supabase";
+import { supabase } from "../../helper/imp/supabase";
 const global = useGlobalState();
 
-// state
-const fav_array = ref<any[]>([]);
+// state & vars
 const loading = ref(true);
 const error = ref<string | null>(null);
+const sneakers = ref<any>([])
 
 // загрузка избранного
 async function fetchFavs() {
-  if (!global.user.id || global.user.id === "filler") {
-    fav_array.value = [];
-    loading.value = false;
-    return;
-  }
   loading.value = true;
   error.value = null;
   try {
     const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
+    sneakers.value = data;
     if (supabaseError) throw supabaseError;
-    const sneakersMap = new Map<number, any>();
-    data?.forEach((item) => sneakersMap.set(item.id, item));
-    fav_array.value = global.user.favourite.map((fav) => {
-      const sneaker = sneakersMap.get(fav.id);
-      if (!sneaker) return null;
-      const colorIndex = (sneaker.colors as sneaker_color[]).findIndex((c: sneaker_color) => c.name === fav.color);
-      return {
-        ...sneaker,
-        favouriteColor: colorIndex >= 0 ? colorIndex : 0,
-        favouriteSize: fav.size,
-      };
-    }).filter(Boolean);
   } catch (err: any) {
     console.error("Ошибка загрузки избранного:", err);
     error.value = err.message ?? String(err);
@@ -54,29 +38,50 @@ async function fetchFavs() {
 }
 
 // удаление элемента
-function handleItemRemoved(itemId: number) {
-  fav_array.value = fav_array.value.filter((item) => item.id !== itemId);
+async function handleItemRemoved(removedItem: product_item) {
+  if (global.user?.favourite) {
+    global.user.favourite = global.user.favourite.filter((item: product_item) => item.id !== removedItem.id || item.color !== removedItem.color);
+    if (global.user.id !== "Guest") {
+      try {
+        const { error } = await supabase.from("profiles").update({ favourite: global.user.favourite }).eq("id", global.user.id);
+        if (error) { console.error("Ошибка синхронизации:", error) } 
+      } catch (err: any) {
+        console.error("Ошибка при обновлении:", err);
+      }
+    }
+  }
 }
 
-// следим за изменением пользователя или избранного
-watch(() => [global.user.id, global.user.favourite], () => fetchFavs(), { deep: true });
-
 // монтирование
-onMounted(fetchFavs);
+onMounted(() => fetchFavs());
+
+// следим за изменением пользователя или избранного
+watch(() => global.user?.favourite, () => {
+  if (global.user && global.user.id === "Guest") { return 
+  } else {
+    fetchFavs();
+  }}, { deep: true }
+);
 </script>
 
 <template>
   <wrapper_main>
     <header_main />
-    <main :class="fav_array.length === 0 ? 'center' : 'normal'">
+    <main :class="loading || !global.user || global.user.favourite?.length === 0 ? 'center' : 'normal'">
       <div v-if="loading" class="loa">
         <loading_main />
       </div>
-      <favourite_item v-else v-for="item in fav_array" :key="`${item.id}-${item.favouriteColor}`" :data="item" @item-removed="handleItemRemoved" />
-      <div v-if="!loading && fav_array.length === 0" class="loa">
+      <favourite_item
+        v-else-if="!loading && global.user && global.user.favourite?.length !== 0"
+        v-for="item in global.user?.favourite"
+        :key="`${item.id}-${item.color}`"
+        :data="item"
+        :sneaker="sneakers.find((s: any) => s.id === item.id)"
+        @item-removed="handleItemRemoved"
+      />
+      <div v-else-if="!loading && (!global.user || !global.user.favourite || global.user.favourite.length === 0)" class="loa">
         <img src="/public/gif/evernight.gif" alt="No items" />
-        <p v-if="global.user.id !== 'filler'">No sneakers in favourite</p>
-        <p v-else>You are not authorized</p>
+        <p>No sneakers in favourite</p>
       </div>
     </main>
   </wrapper_main>

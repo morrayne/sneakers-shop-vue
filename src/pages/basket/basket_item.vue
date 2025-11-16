@@ -7,8 +7,24 @@ import { useGlobalState } from "../../helper/pinia";
 import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
+// types
+interface Color {
+  name: string;
+  folder_name: string;
+}
+interface BasketItem {
+  id: number;
+  name: string;
+  favouriteColor: number;
+  favouriteSize: string;
+  colors: Color[];
+  gender: string;
+  rating: number;
+  cost: number;
+}
+
 // props & emits
-const props = defineProps<{ data: any }>();
+const props = defineProps<{ data: BasketItem }>();
 const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
 
 // vars
@@ -20,17 +36,24 @@ async function removeFromBasket() {
   loading.value = true;
   try {
     const { id, favouriteColor, favouriteSize, colors } = props.data;
-    const colorName = colors[favouriteColor]?.name;
+    const colorName = colors[favouriteColor]?.name ?? "";
+    
+    if (!global.user) throw new Error("Пользователь не инициализирован");
+    
     const updatedBasket = global.user.basket.filter((item) => {
       const sameId = item.id === id;
       const sameSize = item.size === favouriteSize;
-      const itemColorStr = typeof item.color === "number" ? colors[item.color].name : (item.color as string);
-      return !(sameId && sameSize && itemColorStr === colorName);
+      
+      // Простое сравнение цвета - если color это число, сравниваем числа, если строка - сравниваем строки
+      const sameColor = typeof item.color === "number" 
+        ? item.color === favouriteColor
+        : item.color === colorName;
+      
+      return !(sameId && sameSize && sameColor);
     });
+    
     await updateUserField("basket", updatedBasket);
-    global.user.basket = updatedBasket;
     emit("item-removed", id, favouriteColor, favouriteSize);
-    console.log("✅ Удалено:", id, colorName, favouriteSize);
   } catch (err: any) {
     console.error("❌ Ошибка при удалении:", err.message ?? err);
     alert("Не удалось удалить товар");
@@ -41,22 +64,22 @@ async function removeFromBasket() {
 </script>
 
 <template>
-  <div class="item" v-if="data">
+  <div class="item" v-if="props.data">
     <div class="img-wrapper">
+      <img :src="`/sneakers/${props.data.id}-${props.data.colors[props.data.favouriteColor]?.folder_name || props.data.colors[0]?.folder_name}/0.jpg`" :alt="props.data.name" />
       <button class="bin" @click="removeFromBasket" :disabled="loading">
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
-      <div class="tag">{{ data.colors[data.favouriteColor]?.name }}</div>
-      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor].folder_name}/0.jpg`" :alt="data.name" />
+      <div class="tag">{{ props.data.colors[props.data.favouriteColor]?.name }}</div>
     </div>
     <div class="details">
-      <div class="name">{{ data.name }}</div>
+      <div class="name">{{ props.data.name }}</div>
       <div class="stags">
-        <div class="stag">{{ data.gender }}</div>
-        <div class="stag">{{ data.favouriteSize }}</div>
-        <div class="stag">{{ data.rating }} / 100</div>
+        <div class="stag">{{ props.data.gender }}</div>
+        <div class="stag">{{ props.data.favouriteSize }}</div>
+        <div class="stag">{{ props.data.rating }} / 100</div>
       </div>
-      <div class="movetobasket">{{ data.cost }} rub</div>
+      <div class="movetobasket">{{ props.data.cost }} rub</div>
     </div>
   </div>
 </template>

@@ -14,11 +14,11 @@ import left_main from "./auth/left.vue";
   <wrapper_main>
     <header_main />
     <main>
-      <div class="left" v-if="global.user.id !== 'filler'">
+      <div class="left" v-if="global.user && global.user.id !== 'Guest'">
         <left_main :user="global.user" />
       </div>
-      <div :class="global.user.id !== 'filler' ? 'chopped-right' : 'full-right'">
-        <registration_form v-if="global.user.id === 'filler'" />
+      <div :class="global.user && global.user.id !== 'Guest' ? 'chopped-right' : 'full-right'">
+        <registration_form v-if="global.user && global.user.id === 'Guest'" />
       </div>
     </main>
   </wrapper_main>

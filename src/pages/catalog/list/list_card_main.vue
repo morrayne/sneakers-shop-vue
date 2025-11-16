@@ -18,7 +18,13 @@ onMounted(() => { active_color.value = props.data.displayColor ?? 0 });
 
 // vars
 const activeColorData = computed(() => props.data.colors?.[active_color.value]);
-const isFavourite = computed(() => global.user.favourite.some((f) => f.id === props.data.id && f.color === activeColorData.value?.name && f.size === "42.0"));
+const isFavourite = computed(() => 
+  global.user?.favourite?.some((f) => 
+    f.id === props.data.id && 
+    f.color === activeColorData.value?.name && 
+    f.size === "42.0"
+  ) ?? false
+);
 
 // добавление в корзину
 async function handleAddToBasket(event: Event) {
@@ -79,10 +85,10 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
       <div class="tag">{{ props.data.gender }}</div>
     </div>
     <div class="duo">
-      <button class="btn" :disabled="global.user.id === 'filler'" @click="handleAddToBasket">
+      <button class="btn" v-if="global.user" :disabled="global.user.id === 'filler'" @click="handleAddToBasket">
         {{ `${props.data.cost} rub` }}
       </button>
-      <button class="fav" :disabled="global.user.id === 'filler'" @click="toggleFavourite">
+      <button class="fav" v-if="global.user" :disabled="global.user.id === 'filler'" @click="toggleFavourite">
         <img src="/public/svg/heart.svg" :class="{ active: isFavourite }" />
       </button>
     </div>

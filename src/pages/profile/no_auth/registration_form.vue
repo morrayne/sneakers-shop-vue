@@ -3,7 +3,11 @@
 import { reactive, ref } from "vue"
 
 // actions
-import { loginUser, registerUser } from "../../../helper/actions"
+import { loginUser, registerUser, syncPiniaAndSupabase } from "../../../helper/actions";
+import { useGlobalState } from "../../../helper/pinia";
+const global = useGlobalState();
+
+import { supabase } from "../../../helper/imp/supabase";
 
 // vars
 const mode = ref<"login" | "register">("login")
@@ -19,12 +23,58 @@ async function handleSubmit(e: Event) {
   e.preventDefault()
   try {
     if (mode.value === "register") {
-      await registerUser({ email: data.email, password: data.password, name: data.name, icon: data.icon - 1 })
+      const savedFavourite = global.user?.favourite || [];
+      const savedBasket = global.user?.basket || [];
+      
+      console.log("🔍 [1] Данные ДО регистрации:", {
+        favourite: savedFavourite,
+        basket: savedBasket,
+        globalUser: global.user
+      });
+      
+      const userId = await registerUser({ 
+        email: data.email, 
+        password: data.password, 
+        name: data.name, 
+        icon: data.icon - 1 
+      });
+      
+      console.log("🔍 [2] После registerUser, userId:", userId);
+      console.log("🔍 [3] Global.user после регистрации:", global.user);
+      
+      if (savedFavourite.length > 0 || savedBasket.length > 0) {
+        console.log("🔍 [4] Начинаем обновление...");
+        
+        const updates: any = {};
+        if (savedFavourite.length > 0) updates.favourite = savedFavourite;
+        if (savedBasket.length > 0) updates.basket = savedBasket;
+        
+        console.log("🔍 [5] Updates:", updates);
+        
+        const { data: updateResult, error } = await supabase
+          .from("profiles")
+          .update(updates)
+          .eq("id", userId)
+          .select();
+          
+        console.log("🔍 [6] Результат обновления:", { updateResult, error });
+        
+        if (error) {
+          console.error("❌ Ошибка обновления профиля:", error);
+        } else {
+          console.log("✅ Данные успешно обновлены");
+          // Принудительно перезагружаем сессию
+          await supabase.auth.refreshSession();
+          // И пересинхронизируем
+          await syncPiniaAndSupabase(userId);
+        }
+      }
+      
     } else {
-      await loginUser(data.email, data.password)
+      await loginUser(data.email, data.password);
     }
   } catch (err: any) {
-    console.error(err.message)
+    console.error("❌ Ошибка:", err.message);
   }
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue
-import { ref, onMounted, watch } from "vue";
+import { computed, onMounted, watch, ref } from "vue";
 
 // components
 import loading_main from "../../common/loading/loading_main.vue";
@@ -9,96 +9,150 @@ import header_main from "../../common/header/header_main.vue";
 import basket_item from "./basket_item.vue";
 
 // pinia & supabase
-import { supabase } from "../../helper/supabase";
 import { useGlobalState } from "../../helper/pinia";
+import { supabase } from "../../helper/imp/supabase";
+import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
-// helper & types
-import { updateUserField } from "../../helper/actions";
-import type { sneaker_color } from "../../helper/types";
+// types
+import type { sneaker_color, product_item } from "../../helper/types";
 
-// vars
-const basket_array = ref<any[]>([]);
+// state
 const loading = ref(true);
 const error = ref<string | null>(null);
+const sneakersMap = ref<Map<number, any>>(new Map());
 
-// загрузка корзины
-async function fetchBasket() {
-  if (global.user.id === "filler") {
-    basket_array.value = [];
-    loading.value = false;
-    return;
-  }
+// ----------------------
+// загрузка всех кроссовок (для отображения корзины)
+async function loadSneakers() {
   loading.value = true;
   error.value = null;
   try {
-    const { data: sneakers, error: supabaseError } = await supabase.from("sneakers").select("*");
+    const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
     if (supabaseError) throw supabaseError;
-    const sneakersMap = new Map<number, any>();
-    sneakers?.forEach((item) => sneakersMap.set(item.id, item));
-    basket_array.value = global.user.basket.map((basketItem) => {
-      const sneaker = sneakersMap.get(basketItem.id);
-      if (!sneaker) return null;
-      const colorIndex = typeof basketItem.color === "number" ? basketItem.color : (sneaker.colors as sneaker_color[]).findIndex((c) => c.name === basketItem.color);
-      return {
-        ...sneaker,
-        favouriteColor: colorIndex,
-        favouriteSize: basketItem.size,
-      }}
-    ).filter(Boolean);
+
+    const map = new Map<number, any>();
+    data?.forEach((item) => map.set(item.id, item));
+    sneakersMap.value = map;
   } catch (err: any) {
     console.error("Ошибка загрузки корзины:", err);
-    error.value = err.message;
+    error.value = err.message ?? String(err);
   } finally {
     loading.value = false;
   }
 }
 
-// удаления элемента
+// ----------------------
+// вычисляемая корзина напрямую из Pinia
+const basketItems = computed(() => {
+  const user = global.user;
+  if (!user) return [];
+  if (!user.basket || user.basket.length === 0) return [];
+
+  return user.basket
+    .map((basketItem: product_item) => {
+      const sneaker = sneakersMap.value.get(basketItem.id);
+      if (!sneaker) return null;
+
+      const colors = sneaker.colors as sneaker_color[];
+      const colorIndex =
+        typeof basketItem.color === "number"
+          ? basketItem.color
+          : colors.findIndex((c) => c.name === basketItem.color);
+
+      return {
+        ...sneaker,
+        favouriteColor: colorIndex >= 0 ? colorIndex : 0,
+        favouriteSize: basketItem.size,
+      };
+    })
+    .filter(Boolean);
+});
+
+// ----------------------
+// удаление элемента из корзины
 async function handleItemRemoved(itemId: number, colorIndex: number, size: string) {
-  const updatedBasket = global.user.basket.filter((item) => {
+  const user = global.user;
+  if (!user) return;
+
+  const updatedBasket = user.basket.filter((item: product_item) => {
     const sameId = item.id === itemId;
     const sameSize = item.size === size;
-    const sameColor = String(item.color) === String(colorIndex);
-    return !(sameId && sameColor && sameSize);
+    
+    // Сравниваем цвет через индекс или имя
+    const itemColorIndex = typeof item.color === "number" 
+      ? item.color 
+      : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
+    
+    return !(sameId && sameSize && itemColorIndex === colorIndex);
   });
-  await updateUserField("basket", updatedBasket);
-  global.user.basket = updatedBasket;
-  basket_array.value = basket_array.value.filter((item) => item.id !== itemId || item.favouriteColor !== colorIndex || item.favouriteSize !== size);
-  console.log("🗑️ Удалено из корзины:", itemId, colorIndex, size);
+
+  if (user.id === "Guest") {
+    user.basket = updatedBasket;
+  } else {
+    await updateUserField("basket", updatedBasket);
+  }
 }
 
-// монтирование
-onMounted(fetchBasket);
+// ----------------------
+// общая стоимость
+const totalCost = computed(() => {
+  return basketItems.value.reduce((sum, item) => sum + (item.cost || 0), 0);
+});
 
-// следим за изменением пользователя или корзины
-watch(() => global.user.id, fetchBasket);
+// ----------------------
+// монтирование и отслеживание изменений
+onMounted(() => {
+  loadSneakers();
+});
+
+// следим за изменением корзины
+watch(
+  () => global.user?.basket,
+  () => {
+    if (global.user) loadSneakers();
+  },
+  { deep: true }
+);
 </script>
 
 <template>
   <wrapper_main>
     <header_main />
     <main>
-      <div :class="basket_array.length === 0 ? 'center' : 'normal'">
+      <div :class="loading || basketItems.length === 0 ? 'center' : 'normal'">
         <div v-if="loading" class="loa">
           <loading_main />
         </div>
-        <basket_item v-else v-for="item in basket_array" :key="`${item.id}-${item.favouriteColor}`" :data="item" @item-removed="handleItemRemoved" />
-        <div v-if="!loading && basket_array.length === 0" class="loa">
+
+        <basket_item
+          v-else-if="basketItems.length > 0"
+          v-for="item in basketItems"
+          :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`"
+          :data="item"
+          @item-removed="handleItemRemoved"
+        />
+
+        <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
-          <p v-if="global.user.id !== 'filler'">No sneakers in basket</p>
+          <p v-if="global.user?.id && global.user.id !== 'Guest'">
+            No sneakers in basket
+          </p>
           <p v-else>You are not authorized</p>
         </div>
       </div>
-      <div class="right" v-if="basket_array.length !== 0">
-        <div class="vfv" v-for="value in basket_array">
-          <div class="name">
-            {{ value.name }}
-          </div>
+
+      <div class="right" v-if="!loading && basketItems.length > 0">
+        <div
+          class="vfv"
+          v-for="value in basketItems"
+          :key="`${value.id}-${value.favouriteColor}-${value.favouriteSize}`"
+        >
+          <div class="name">{{ value.name }}</div>
           <div class="cost">{{ value.cost }} rub</div>
         </div>
         <div class="finalcost">
-          {{ basket_array.reduce((sum, item) => sum + (item.cost || 0), 0) }} rub
+          {{ totalCost }} rub
         </div>
       </div>
     </main>
@@ -161,9 +215,9 @@ main {
       color: var(--bg-a);
       text-align: center;
       cursor: pointer;
+      margin-top: 1rem;
+      font-weight: bold;
     }
-  }  ::-webkit-scrollbar {
-    display: none;
   }
 
   .loa {

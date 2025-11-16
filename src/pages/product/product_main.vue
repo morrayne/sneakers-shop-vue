@@ -2,10 +2,13 @@
 // vue
 import { ref, reactive, onMounted, watch } from "vue";
 
-// pinia & supabase & router
+// pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
 const global = useGlobalState();
-import { supabase } from "../../helper/supabase";
+import { supabase } from "../../helper/imp/supabase";
+
+// router & actions
+import { updateUserField } from "../../helper/actions";
 import { useRoute } from "vue-router";
 const route = useRoute();
 
@@ -44,48 +47,45 @@ watch(() => route.params.id, (newId) => {
 });
 
 // добавление в избранное
-async function addToFavourite(user_id: string, product_id: number) {
-  if (!user_id || user_id === "filler") return;
+async function addToFavourite() {
   try {
-    const { data: userData, error: fetchError } = await supabase.from("profiles").select("favourite").eq("id", user_id).single();
-    if (fetchError) throw fetchError;
-    const current = userData?.favourite ?? [];
+    const product_id = product.value.id;
     const colorName = product.value.colors[selected.color].name;
-    const exists = current.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
-    const updated = exists? current.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...current, { id: product_id, color: colorName, size: selected.size }];
-    const { error: updateError } = await supabase.from("profiles").update({ favourite: updated }).eq("id", user_id).select();
-    if (updateError) throw updateError;
-    global.user.favourite = updated;
+    if (!global.user) return;
+    const currentFavourite = global.user.favourite || [];
+    const exists = currentFavourite.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
+    const updatedFavourite = exists ? currentFavourite.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...currentFavourite, { id: product_id, color: colorName, size: selected.size }];
+    if (global.user.id === "Guest") {
+      global.user.favourite = updatedFavourite;
+    } else {
+      await updateUserField("favourite", updatedFavourite);
+    }
   } catch (err) {
-    console.error("Ошибка при обновлении избранного:", err);
+    console.error("❌ Ошибка при обновлении избранного:", err);
   }
 }
 
 // Добавление в корзину
-async function addToBasket(user_id: string, product_id: number) {
-  if (!user_id || user_id === "filler") return;
+async function addToBasket() {
   try {
-    const { data: userData, error: fetchError } = await supabase.from("profiles").select("basket").eq("id", user_id).single();
-    if (fetchError) throw fetchError;
-    const current = userData?.basket ?? [];
+    const product_id = product.value.id;
     const colorName = product.value.colors[selected.color].name;
-    const exists = current.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
-    const updated = exists ? current.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...current, { id: product_id, color: colorName, size: selected.size }];
-    const { error: updateError } = await supabase.from("profiles").update({ basket: updated }).eq("id", user_id).select();
-    if (updateError) throw updateError;
-    global.user.basket = updated;
+    if (!global.user) return;
+    const currentBasket = global.user.basket || [];
+    const exists = currentBasket.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
+    const updatedBasket = exists ? currentBasket.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)): [...currentBasket, { id: product_id, color: colorName, size: selected.size }];
+    if (global.user.id === "Guest") {
+      global.user.basket = updatedBasket;
+    } else {
+      await updateUserField("basket", updatedBasket);
+    } 
   } catch (err) {
-    console.error("Ошибка при обновлении корзины:", err);
+    console.error("❌ Ошибка при обновлении корзины:", err);
   }
 }
 
 // восстановление сессии при f5
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
-    if (profileData) Object.assign(global.user, profileData);
-  }
   productId.value = route.params.id as string;
   fetchProduct();
 });
@@ -129,11 +129,11 @@ onMounted(async () => {
           </div>
         </div>
         <div class="duo-button">
-          <button class="cart" :disabled="global.user.id === 'filler'" @click="addToBasket(global.user.id, product.id)">
+          <button class="cart" @click="addToBasket()">
             <img src="/svg/bag.svg" alt="" />
-            <span @click="addToFavourite(global.user.id, product.id)">Add to cart</span>
+            <span>Add to cart</span>
           </button>
-          <button class="favourite" :disabled="global.user.id === 'filler'" @click="addToFavourite(global.user.id, product.id)">
+          <button class="favourite" @click="addToFavourite()">
             <img src="/svg/heart.svg" alt="" />
           </button>
         </div>

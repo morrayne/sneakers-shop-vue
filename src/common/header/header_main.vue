@@ -16,7 +16,7 @@ const global = useGlobalState();
       <router-link to="/settings">SETTINGS</router-link>
     </div>
     <router-link class="icon-wrapper" to="/profile">
-      <img v-if="global.user.id !== 'filler'" :src="`/profile/${global.user.icon}.jpg`" alt="user-icon">
+      <img v-if="global.user && global.user.id !== 'Guest'" :src="`/profile/${global.user.icon}.jpg`" alt="user-icon">
       <img v-else :src="`/profile/0.jpg`" alt="user-icon">
     </router-link>
   </header>

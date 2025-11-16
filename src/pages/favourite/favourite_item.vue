@@ -1,68 +1,87 @@
 <script setup lang="ts">
-// vue
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import type { product_item, sneaker_item, sneaker_color } from "../../helper/types";
 
-// pinia & actions
+// props & emits
+const props = defineProps<{ 
+  data: product_item; 
+  sneaker: sneaker_item | null
+}>();
+const emit = defineEmits<{
+  (e: 'item-removed', item: product_item): void
+  (e: 'size-changed', item: product_item, newSize: string): void
+}>();
+
+// pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
 import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
-// props
-const props = defineProps<{ data: any }>();
-
-// emits
-const emit = defineEmits<{ itemRemoved: [id: number] }>();
-
 // vars
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
+const selectedSize = ref(props.data.size || sizes[0]);
 const loading = ref(false);
+const selectedFolder = computed((): sneaker_color | undefined => { return props.sneaker?.colors?.find((c: sneaker_color) => c.name === props.data.color) });
 
 // удаление из избранного
-async function removeFromFavourite() {
-  if (loading.value) return;
-  try {
-    const colorName = props.data.colors[props.data.favouriteColor].name;
-    const updatedFavourites = global.user.favourite.filter((item) => !(item.id === props.data.id && item.color === colorName));
-    await updateUserField("favourite", updatedFavourites);
-    global.user.favourite = updatedFavourites;
-    emit("itemRemoved", props.data.id);
-  } catch (err) {
-    console.error("Ошибка при удалении из избранного:", err);
-    alert("Не удалось удалить товар из избранного");
-  }
+function removeFromFavourite(): void {
+  emit('item-removed', props.data);
 }
 
 // перевыбор размера
-async function selectSize(size: string) {
+async function selectSize(size: string): Promise<void> {
+  if (size === selectedSize.value || loading.value || !global.user) return;
+  loading.value = true;
   try {
-    const colorName = props.data.colors[props.data.favouriteColor]?.name;
-    const updatedFavourites = global.user.favourite.map((item) => item.id === props.data.id && item.color === colorName ? { ...item, size } : item);
-    await updateUserField("favourite", updatedFavourites);
-    global.user.favourite = updatedFavourites;
+    selectedSize.value = size;
+    const updatedItem: product_item = { ...props.data, size: size };
+    const updatedFavourite: product_item[] = global.user.favourite.map((item: product_item) => item.id === props.data.id && item.color === props.data.color ? updatedItem : item);
+    if (global.user.id !== "Guest") {
+      await updateUserField("favourite", updatedFavourite);
+    } else {
+      global.user.favourite = updatedFavourite;
+    }
+    emit('size-changed', updatedItem, size);
   } catch (err) {
-    console.error("Ошибка при обновлении размера:", err);
-    alert("Не удалось обновить размер");
+    console.error("❌ Ошибка при изменении размера:", err);
+  } finally {
+    loading.value = false;
   }
 }
 
 // перемещение в корзину
-async function moveToBasket() {
-  if (loading.value) return;
+async function moveToBasket(): Promise<void> {
+  if (loading.value || !global.user) return;
   loading.value = true;
   try {
-    const colorName = props.data.colors[props.data.favouriteColor]?.name || "default";
-    const size = props.data.favouriteSize || sizes[0];
-    const basketItem = { id: props.data.id, color: colorName, size };
-    const updatedBasket = [...global.user.basket, basketItem];
-    const updatedFavourites = global.user.favourite.filter((item) => !(item.id === props.data.id && item.color === colorName));
-    await updateUserField("basket", updatedBasket);
-    await updateUserField("favourite", updatedFavourites);
-    global.user.basket = updatedBasket;
-    global.user.favourite = updatedFavourites;
-    emit("itemRemoved", props.data.id);
+    const basketItem: product_item = {
+      id: props.data.id,
+      color: props.data.color,
+      size: selectedSize.value!
+    };
+    const currentBasket: product_item[] = global.user.basket || [];
+    const existsInBasket: boolean = currentBasket.some((item: product_item) => 
+      item.id === basketItem.id && 
+      item.color === basketItem.color && 
+      item.size === basketItem.size
+    );
+    if (!existsInBasket) {
+      const updatedBasket: product_item[] = [...currentBasket, basketItem];
+      if (global.user.id !== "Guest") {
+        await updateUserField("basket", updatedBasket);
+      } else {
+        global.user.basket = updatedBasket;
+      }
+    }
+    const updatedFavourite: product_item[] = global.user.favourite.filter((item: product_item) => !(item.id === props.data.id && item.color === props.data.color));
+    if (global.user.id !== "Guest") {
+      await updateUserField("favourite", updatedFavourite);
+    } else {
+      global.user.favourite = updatedFavourite;
+    }
+    emit('item-removed', props.data);
   } catch (err) {
-    console.error("Ошибка при перемещении в корзину:", err);
-    alert("Не удалось переместить товар в корзину");
+    console.error("❌ Ошибка при перемещении в корзину:", err);
   } finally {
     loading.value = false;
   }
@@ -70,23 +89,25 @@ async function moveToBasket() {
 </script>
 
 <template>
-  <div class="item" v-if="data">
+  <div class="item" v-if="data && sneaker && selectedFolder">
     <div class="img-wrapper">
       <button class="bin" @click="removeFromFavourite" :disabled="loading">
         <img src="/public/svg/bin.svg" alt="Delete" />
       </button>
-      <div class="tag">{{ data.colors[data.favouriteColor]?.name || "Unknown" }}</div>
-      <img :src="`/sneakers/${data.id}-${data.colors[data.favouriteColor]?.folder_name || 'default'}/0.jpg`" alt="Sneaker" />
+      <div class="tag">{{ selectedFolder.name }}</div>
+      <img :src="`/sneakers/${sneaker.id}-${selectedFolder.folder_name}/0.jpg`" :alt="sneaker.name" />
     </div>
     <div class="details">
-      <div class="name">{{ data.name }}</div>
+      <div class="name">{{ sneaker.name }}</div>
       <div class="sizes">
-        <div v-for="size in sizes" :key="size" :class="{ size: true, active: size === data.favouriteSize }" @click="selectSize(size)">
+        <div v-for="size in sizes" :key="size" :class="{ size: true, active: size === selectedSize }" @click="selectSize(size)":disabled="loading">
           {{ size }}
         </div>
       </div>
       <div class="duo">
-        <div class="movetobasket" @click="moveToBasket">Move to basket</div>
+        <div class="movetobasket" @click="moveToBasket" :disabled="loading">
+          {{ loading ? 'Pending...' : 'Move to basket' }}
+        </div>
       </div>
     </div>
   </div>

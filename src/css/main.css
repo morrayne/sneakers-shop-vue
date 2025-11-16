@@ -4,7 +4,7 @@ main {
   display: flex;
 }
 main .left {
-  width: 32rem;
+  height: 100%;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@ main .left .tags .tag {
   cursor: pointer;
 }
 main .left .main-img {
-  width: 100%;
+  height: 60%;
   aspect-ratio: 1/1;
   position: relative;
   overflow: hidden;

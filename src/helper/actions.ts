@@ -1,51 +1,88 @@
 // imports
-import { supabase } from "./supabase";
+import { supabase } from "./imp/supabase";
 import { useGlobalState } from "./pinia";
 import type { user_type, product_item } from "./types";
 
-//  🔐  ДЕЙСТВИЯ С АККАУНТОМ
-// регистрация нового пользователя
-export async function registerUser(form: Pick<user_type, "email" | "password" | "name" | "icon">) {
+// 🔧 Проверка гостя
+function isGuest(user: user_type | null): boolean {
+  return !user || user.id === "Guest";
+}
+
+// 🔐 ИНИЦИАЛИЗАЦИЯ (гость или восстановление сессии)
+export async function initAuth() {
   const global = useGlobalState();
-  const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: form.password });
-  if (authError) throw authError;
-  if (!authData.user) throw new Error("Ошибка регистрации: пользователь не создан");
-  const { error: insertError } = await supabase.from("profiles").insert([
-    {
-      id: authData.user.id,
-      name: form.name,
-      icon: form.icon,
+  const { data: session } = await supabase.auth.getSession();
+  const user = session.session?.user;
+  if (user) {
+    await syncPiniaAndSupabase(user.id);
+  } else {
+    global.setUser({
+      id: "Guest",
+      email: "",
+      password: "",
+      name: "Guest",
+      icon: 0,
       favourite: [],
       basket: [],
       history: [],
-    },
-  ]);
+    });
+  }
+}
+
+// 🔐 РЕГИСТРАЦИЯ
+export async function registerUser(form: Pick<user_type, "email" | "password" | "name" | "icon">) {
+  const global = useGlobalState();
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: form.email,
+    password: form.password,
+  });
+  if (authError) throw authError;
+  if (!authData.user) throw new Error("Ошибка регистрации: пользователь не создан");
+  const { error: insertError } = await supabase.from("profiles").insert([{
+    id: authData.user.id,
+    name: form.name,
+    icon: form.icon,
+    favourite: [],
+    basket: [],
+    history: [],
+  }]);
   if (insertError) throw insertError;
   await syncPiniaAndSupabase(authData.user.id);
   console.log("✅ Зарегистрирован:", global.user);
   return authData.user.id;
 }
 
-// авторизация
+// 🔐 ВХОД
 export async function loginUser(email: string, password: string) {
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
   if (authError) throw authError;
   if (!authData.user) throw new Error("Ошибка авторизации: пользователь не найден");
   await syncPiniaAndSupabase(authData.user.id);
   console.log("✅ Вход выполнен");
 }
 
-// выход из профиля
+// 🔐 ВЫХОД
 export async function logoutUser() {
   const global = useGlobalState();
   const { error } = await supabase.auth.signOut();
-  global.clearUser();
+  global.setUser({
+    id: "Guest",
+    email: "",
+    password: "",
+    name: "Guest",
+    icon: 0,
+    favourite: [],
+    basket: [],
+    history: [],
+  });
   if (error) console.warn("Ошибка при выходе:", error.message);
   else console.log("✅ Выход выполнен");
 }
 
-//  🔄  СИНХРОНИЗАЦИЯ
-// перезапись профиля из Supabase в global.user (pinia)
+// 🔄 СИНХРОНИЗАЦИЯ SUPABASE → PINIA
 export async function syncPiniaAndSupabase(user_id: string) {
   const global = useGlobalState();
   const { data: profile, error } = await supabase.from("profiles").select("*").eq("id", user_id).single();
@@ -63,55 +100,67 @@ export async function syncPiniaAndSupabase(user_id: string) {
   });
 }
 
-//  🛒  ДЕЙСТВИЯ С ТОВАРАМИ
-// добавление товара в корзину
+// 🛒 КОРЗИНА
 export async function addToBasket(item: product_item) {
   const global = useGlobalState();
-  if (global.user.id === "filler") throw new Error("Неавторизованный пользователь");
-  const newBasket = [...global.user.basket, item];
-  await updateUserField("basket", newBasket);
-  global.user.basket = newBasket;
+  const user = global.user;
+  if (!user) return;
+  const newBasket = [...user.basket, item];
+  if (isGuest(user)) {
+    global.updateUserField("basket", newBasket);
+  } else {
+    await updateUserField("basket", newBasket);
+  }
 }
 
-// удаление товара из корзины
 export async function removeFromBasket(item: product_item) {
   const global = useGlobalState();
-  const newBasket = global.user.basket.filter((b) => !(b.id === item.id && b.color === item.color && b.size === item.size));
-  await updateUserField("basket", newBasket);
-  global.user.basket = newBasket;
+  const user = global.user;
+  if (!user) return;
+  const newBasket = user.basket.filter((b) => !(b.id === item.id && b.color === item.color && b.size === item.size));
+  if (isGuest(user)) {
+    global.updateUserField("basket", newBasket);
+  } else {
+    await updateUserField("basket", newBasket);
+  }
 }
 
-// добавление товара в избранное
+// ⭐ ИЗБРАННОЕ
 export async function addToFavourites(item: product_item) {
   const global = useGlobalState();
-  if (global.user.id === "filler") throw new Error("Неавторизованный пользователь");
-  const newFavs = [...global.user.favourite, item];
-  console.log(newFavs);
-  await updateUserField("favourite", newFavs);
-  global.user.favourite = newFavs;
+  const user = global.user;
+  if (!user) return;
+  const newFavs = [...user.favourite, item];
+  if (isGuest(user)) {
+    global.updateUserField("favourite", newFavs);
+  } else {
+    await updateUserField("favourite", newFavs);
+  }
 }
 
-// удаление из избранного
 export async function removeFromFavourites(item: product_item) {
   const global = useGlobalState();
-  const newFavs = global.user.favourite.filter((f) => !(f.id === item.id && f.color === item.color && f.size === item.size));
-  await updateUserField("favourite", newFavs);
-  global.user.favourite = newFavs;
+  const user = global.user;
+  if (!user) return;
+  const newFavs = user.favourite.filter((f) => !(f.id === item.id && f.color === item.color && f.size === item.size));
+  if (isGuest(user)) {
+    global.updateUserField("favourite", newFavs);
+  } else {
+    await updateUserField("favourite", newFavs);
+  }
 }
 
-//  🧱  СЛУЖЕБНЫЕ
-// обновление данных профиля
+// 🧱 Обновление полей профиля в Supabase
 type UpdatableFields = "favourite" | "basket" | "history";
 export async function updateUserField(field: UpdatableFields, value: any[]) {
   const global = useGlobalState();
-  if (!global.user.id || global.user.id === "filler") return;
+  const user = global.user;
+  if (!user || isGuest(user)) return;
   try {
-    console.log("📤 Обновление профиля:", { id: global.user.id, field, value });
-    const { data, error } = await supabase.from("profiles").update({ [field]: value }).eq("id", global.user.id).select();
+    const { data, error } = await supabase.from("profiles").update({ [field]: value }).eq("id", user.id).select();
     if (error) throw error;
-    if (!data?.length) throw new Error("Запрос выполнен, но строка не найдена (надо проверить supabase RLS или id)");
-    (global.user as any)[field] = [...value];
-    console.log(`✅ Поле "${field}" обновлено`, data[0]);
+    if (!data?.length) throw new Error("Запрос выполнен, но профиль не найден");
+    global.updateUserField(field, [...value]);
     return data[0];
   } catch (err: any) {
     console.error(`Ошибка обновления поля "${field}":`, err.message ?? err);

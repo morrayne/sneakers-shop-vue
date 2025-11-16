@@ -10,7 +10,7 @@ import list_main from "./list/list_main.vue";
 import sidebar_filler from "./fillers/sidebar_filler.vue";
 
 // supabase
-import { supabase } from "../../helper/supabase";
+import { supabase } from "../../helper/imp/supabase";
 
 // универсальная функция получения уникальных значений
 async function fetchUnique<T>(column: string): Promise<T[]> {

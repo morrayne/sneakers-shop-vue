@@ -3,7 +3,7 @@
 import { ref, onMounted, inject, computed } from 'vue';
 
 // supabase
-import { supabase } from '../../../helper/supabase';
+import { supabase } from '../../../helper/imp/supabase';
 
 // imports
 import list_filler from '../fillers/list_filler.vue';
