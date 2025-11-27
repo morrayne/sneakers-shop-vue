@@ -89,8 +89,8 @@ provide("filterState", {state: everything, arrays: { colors: color_array, brands
     <header_main />
     <main>
       <div class="left">
-        <sidebar_filler v-if="loading" />
-        <sidebar_main v-else :color_array="color_array" :brand_array="brand_array" :gender_array="gender_array" />
+        <sidebar_main v-if="!loading && color_array.length !== 0 && brand_array.length !== 0 && gender_array.length !== 0" :color_array="color_array" :brand_array="brand_array" :gender_array="gender_array" />
+        <sidebar_filler v-else />
       </div>
       <div class="right">
         <list_main />

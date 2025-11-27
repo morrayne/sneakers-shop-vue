@@ -8,7 +8,7 @@ const global = useGlobalState()
 <template>
   <div class="prof">
     <img v-if="global.user" :src="`/profile/${global.user.icon}.jpg`" alt="user icon" />
-    <div v-if="global.user" class="id">{{ global.user.id }}</div>
+    <div v-if="global.user" class="id">{{ global.user.name }}</div>
     <button class="log-out" @click="logoutUser">Log Out</button>
   </div>
 </template>
@@ -28,11 +28,15 @@ const global = useGlobalState()
   }
 
   .id {
+    max-width: 100%;
     width: fit-content;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.8rem;
     background: var(--bg-d);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .log-out {

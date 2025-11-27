@@ -53,13 +53,8 @@ const basketItems = computed(() => {
     .map((basketItem: product_item) => {
       const sneaker = sneakersMap.value.get(basketItem.id);
       if (!sneaker) return null;
-
       const colors = sneaker.colors as sneaker_color[];
-      const colorIndex =
-        typeof basketItem.color === "number"
-          ? basketItem.color
-          : colors.findIndex((c) => c.name === basketItem.color);
-
+      const colorIndex = typeof basketItem.color === "number" ? basketItem.color : colors.findIndex((c) => c.name === basketItem.color);
       return {
         ...sneaker,
         favouriteColor: colorIndex >= 0 ? colorIndex : 0,
@@ -88,19 +83,50 @@ async function handleItemRemoved(itemId: number, colorIndex: number, size: strin
   });
 
   if (user.id === "Guest") {
-    user.basket = updatedBasket;
+    global.updateUserField("basket", updatedBasket);
   } else {
     await updateUserField("basket", updatedBasket);
   }
 }
 
-// ----------------------
 // общая стоимость
 const totalCost = computed(() => {
   return basketItems.value.reduce((sum, item) => sum + (item.cost || 0), 0);
 });
 
-// ----------------------
+// 📦 ПЕРЕМЕЩЕНИЕ КОРЗИНЫ В ИСТОРИЮ ЗАКАЗОВ
+async function moveBasketToHistory() {
+  const user = global.user;
+  if (!user || !user.basket || user.basket.length === 0) return;
+  
+  try {
+    const order = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      items: [...user.basket],
+      total: totalCost.value,
+      status: 'completed' as const
+    };
+
+    const updatedHistory: any = user.history ? [...user.history, order] : [order];
+    
+    if (user.id === "Guest") {
+      // Для гостя обновляем локально
+      global.updateUserField("history", updatedHistory);
+      global.updateUserField("basket", []);
+    } else {
+      // Для авторизованного пользователя обновляем в БД
+      await updateUserField("history", updatedHistory);
+      await updateUserField("basket", []);
+    }
+    
+    console.log('✅ Заказ успешно перемещен в историю');
+  } catch (err: any) {
+    console.error('❌ Ошибка при оформлении заказа:', err);
+    error.value = err.message ?? String(err);
+  }
+}
+
 // монтирование и отслеживание изменений
 onMounted(() => {
   loadSneakers();
@@ -151,9 +177,13 @@ watch(
           <div class="name">{{ value.name }}</div>
           <div class="cost">{{ value.cost }} rub</div>
         </div>
-        <div class="finalcost">
-          {{ totalCost }} rub
-        </div>
+        <button 
+          class="finalcost" 
+          @click="moveBasketToHistory()" 
+          :disabled="!global.user || global.user.id === 'Guest'"
+        >
+          Make purchace {{ totalCost }} rub
+        </button>
       </div>
     </main>
   </wrapper_main>

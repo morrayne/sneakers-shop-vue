@@ -27,6 +27,7 @@ async function fetchSneakers() {
   } catch (err) {
     console.error("Ошибка загрузки sneakers:", err);
   } finally {
+    if (sneakers.value.length === 0) return
     loading.value = false;
   }
 }
