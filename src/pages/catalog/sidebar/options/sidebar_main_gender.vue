@@ -18,7 +18,7 @@ const activeGender = computed(() => filterState.state.filters.gender);
 
 <template>
   <div class="filter-holder">
-    <div class="size">Gender</div>
+    <div class="size i18n" data-key="gender"></div>
     <sidebar_item 
       v-for="item in props.data_array" 
       :key="item" 
@@ -34,6 +34,9 @@ const activeGender = computed(() => filterState.state.filters.gender);
 </template>
 
 <style scoped lang="scss">
+.size.i18n[data-key="gender"]::after {
+  content: var(--gender);
+}
 .filter-holder {
   display: flex;
   flex-direction: column;

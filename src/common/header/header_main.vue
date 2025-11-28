@@ -8,12 +8,11 @@ const global = useGlobalState();
   <header class="header-home">
     <p class="logo">「快歩」</p>
     <div class="header-nav">
-      <router-link to="/home">HOME</router-link>
-      <router-link to="/catalog">CATALOG</router-link>
-      <router-link to="/favourite">FAVOURITE</router-link>
-      <router-link to="/basket">BASKET</router-link>
-      <router-link to="/history">HISTORY</router-link>
-      <router-link to="/settings">SETTINGS</router-link>
+      <router-link to="/home"></router-link>
+      <router-link to="/catalog"></router-link>
+      <router-link to="/favourite"></router-link>
+      <router-link to="/basket"></router-link>
+      <router-link to="/settings"></router-link>
     </div>
     <router-link class="icon-wrapper" to="/profile">
       <img v-if="global.user && global.user.id !== 'Guest'" :src="`/profile/${global.user.icon}.jpg`" alt="user-icon">
@@ -52,11 +51,26 @@ const global = useGlobalState();
 
     * {
       height: 100%;
-      color: var(--text-a);
+      color: var(--main-header-text);
       padding: 0 2rem;
       display: flex;
       align-items: center;
       cursor: pointer;
+      
+      // Убираем стандартный текст
+      color: transparent;
+      
+      // Добавляем контент через CSS переменные
+      &[href="/home"]::after { content: var(--home); }
+      &[href="/catalog"]::after { content: var(--catalog); }
+      &[href="/favourite"]::after { content: var(--favourites); }
+      &[href="/basket"]::after { content: var(--basket); }
+      &[href="/settings"]::after { content: var(--settings); }
+      
+      // Возвращаем цвет для псевдоэлементов
+      &::after {
+        color: var(--text-a);
+      }
     }
 
     *:hover,

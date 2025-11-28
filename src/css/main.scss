@@ -1,6 +1,5 @@
 // IMPORTS
-@use '../pages/product/product_main';
-// @use '../pages/profile/profile_style';
+@use "../pages/product/product_main";
 
 // FONT
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap");
@@ -15,13 +14,16 @@ html {
 }
 
 // RESET
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
@@ -31,7 +33,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
@@ -46,7 +52,8 @@ a {
   text-decoration: none;
   color: inherit;
 }
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 svg {
@@ -54,16 +61,33 @@ svg {
 }
 
 // VARIABLES
-:root {
-  // header
+:root[data-home-theme="green"] {
+  --main-header-bg: #b7cfbe;
+  --sub-header-bg: #94b19d;
+  --main-header-text: #ffffff;
+  --sub-header-text: #000000;
+}
+:root[data-home-theme="pink"] {
+  --main-header-bg: #d9753b;
+  --sub-header-bg: #87224f;
+  --main-header-text: #ffffff;
+  --sub-header-text: #000000;
+}
+:root[data-home-theme="blue"] {
   --main-header-bg: #239dce;
   --sub-header-bg: #0c5096;
   --main-header-text: #ffffff;
   --sub-header-text: #000000;
 }
+:root[data-home-theme="yellow"] {
+  --main-header-bg: #facb3f;
+  --sub-header-bg: #107720;
+  --main-header-text: #ffffff;
+  --sub-header-text: #000000;
+}
 
 // DARK THEME
-:root [data-theme="dark"] {
+:root[data-theme="dark"] {
   // bg
   --bg-a: #131414;
   --bg-b: #1e1e1e;
@@ -71,8 +95,8 @@ svg {
   --bg-d: #424242;
   // text
   --text-a: #fffffe;
-  --text-b: #69686a;
-  --text-c: #5c5c5c;
+  --text-b: #cecece;
+  --text-c: #8d8d8d;
   // accent
   --main-accent: #1c274c;
   --sub-accent: #29396d;
@@ -100,4 +124,87 @@ svg {
   // extra
   --transparent: #00000000;
   --svg-invert: 0;
+}
+
+// lang
+:root[lang="ru"] {
+  --sortBy: "Сортировка";
+  --releaseDate: "Дата появления";
+  --name: "Название";
+  --brand: "Бренд";
+  --colors: "Цвета";
+  --rating: "Рейтинг";
+  --gender: "Пол";
+  --price: "Стоимость";
+  --home: "ГЛАВНАЯ";
+  --catalog: "КАТАЛОГ";
+  --favourites: "ИЗБРАННОЕ";
+  --basket: "КОРЗИНА";
+  --settings: "НАСТРОЙКИ";
+  --lang: "Язык";
+  --common-theme: "Основная тема";
+  --home-screen-theme: "Тема главной страницы";
+  --ru: "русский";
+  --en: "английский";
+  --dark: "темная";
+  --light: "светлая";
+  --green: "зеленая";
+  --pink: "розовая";
+  --blue: "синяя";
+  --yellow: "желтая";
+  --all: "всё";
+  --rub: "руб";
+  --seeMore: "еще";
+  --on: "на";
+  --reviews: "отзывов";
+  --addToCart: "В корзину";
+  --logout: "Выйти из аккаунта";
+  --loading: "Загрузка истории...";
+  --emptyOrderHistory: "История заказов пуста";
+  --order: "Заказ";
+  --totalCost: "Общая стоимость";
+  --emptyBasket: "Корзина пуста";
+  --notAuthorized: "Вы не авторизованы";
+  --makePurchase: "Оформить заказ";
+}
+
+:root[lang="en"] {
+  --sortBy: "Sort by";
+  --releaseDate: "Release date";
+  --name: "Name";
+  --brand: "Brand";
+  --colors: "Colors";
+  --rating: "Rating";
+  --gender: "Gender";
+  --price: "Price";
+  --home: "HOME";
+  --catalog: "CATALOG";
+  --favourites: "FAVOURITE";
+  --basket: "BASKET";
+  --settings: "SETTINGS";
+  --lang: "Language";
+  --common-theme: "Common theme";
+  --home-screen-theme: "Home screen theme";
+  --ru: "russian";
+  --en: "english";
+  --dark: "dark";
+  --light: "light";
+  --green: "green";
+  --pink: "pink";
+  --blue: "blue";
+  --yellow: "yellow";
+  --all: "all";
+  --rub: "rub";
+  --seeMore: "see more";
+  --on: "on";
+  --reviews: "reviews";
+  --addToCart: "Add to cart";
+  --logout: "Log Out";
+  --loading: "Loading history...";
+  --emptyOrderHistory: "Order history is empty";
+  --order: "Order";
+  --totalCost: "Total cost";
+  --emptyBasket: "No sneakers in basket";
+  --notAuthorized: "You are not authorized";
+  --makePurchase: "Make purchase";
 }

@@ -134,8 +134,8 @@ async function moveToBasket(): Promise<void> {
       border-radius: 0.25rem;
       padding: 0.25rem;
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 0.25rem;
+      right: 0.25rem;
       z-index: 2;
       cursor: pointer;
 
@@ -143,6 +143,7 @@ async function moveToBasket(): Promise<void> {
         width: 1.5rem;
         aspect-ratio: 1 / 1;
         margin: 0.25rem;
+        filter: invert(var(--svg-invert));
       }
     }
 
@@ -154,6 +155,8 @@ async function moveToBasket(): Promise<void> {
       color: var(--text-a);
       background: var(--bg-d);
       position: absolute;
+      top: 0.25rem;
+      left: 0.25rem;
       z-index: 2;
     }
 
@@ -176,14 +179,13 @@ async function moveToBasket(): Promise<void> {
       text-align: center;
       font-size: 0.8rem;
       color: var(--text-a);
-      background: var(--bg-c);
-      filter: brightness(0.9);
+      background: var(--bg-d);
       cursor: pointer;
     }
 
     .active {
       color: var(--bg-a);
-      background: var(--text-b);
+      background: var(--text-a);
     }
   }
 
@@ -197,7 +199,7 @@ async function moveToBasket(): Promise<void> {
       border-radius: 0.5rem;
       text-align: center;
       padding: 0.35rem 0;
-      background: var(--text-b);
+      background: var(--text-a);
       color: var(--bg-a);
       cursor: pointer;
     }

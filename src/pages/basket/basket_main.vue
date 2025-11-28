@@ -22,6 +22,18 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const sneakersMap = ref<Map<number, any>>(new Map());
 
+// Функция для получения переведенного текста
+function getTranslatedText(key: string) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`);
+  return value ? value.replace(/^"(.*)"$/, '$1') : key;
+}
+
+// Функция для получения переведенной валюты
+function getTranslatedRub() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--rub');
+  return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
+}
+
 // ----------------------
 // загрузка всех кроссовок (для отображения корзины)
 async function loadSneakers() {
@@ -162,9 +174,9 @@ watch(
         <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
           <p v-if="global.user?.id && global.user.id !== 'Guest'">
-            No sneakers in basket
+            {{ getTranslatedText('emptyBasket') }}
           </p>
-          <p v-else>You are not authorized</p>
+          <p v-else>{{ getTranslatedText('notAuthorized') }}</p>
         </div>
       </div>
 
@@ -175,14 +187,14 @@ watch(
           :key="`${value.id}-${value.favouriteColor}-${value.favouriteSize}`"
         >
           <div class="name">{{ value.name }}</div>
-          <div class="cost">{{ value.cost }} rub</div>
+          <div class="cost">{{ value.cost }} {{ getTranslatedRub() }}</div>
         </div>
         <button 
           class="finalcost" 
           @click="moveBasketToHistory()" 
           :disabled="!global.user || global.user.id === 'Guest'"
         >
-          Make purchace {{ totalCost }} rub
+          {{ getTranslatedText('makePurchase') }} {{ totalCost }} {{ getTranslatedRub() }}
         </button>
       </div>
     </main>

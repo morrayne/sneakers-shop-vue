@@ -16,6 +16,12 @@ const active_color = ref(0);
 // монтирование
 onMounted(() => { active_color.value = props.data.displayColor ?? 0 });
 
+// Функция для получения переведенной валюты
+function getTranslatedRub() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--rub');
+  return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
+}
+
 // vars
 const activeColorData = computed(() => props.data.colors?.[active_color.value]);
 const isFavourite = computed(() => 
@@ -86,7 +92,7 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
     </div>
     <div class="duo">
       <button class="btn" v-if="global.user" :disabled="global.user.id === 'filler'" @click="handleAddToBasket">
-        {{ `${props.data.cost} rub` }}
+        {{ `${props.data.cost} ${getTranslatedRub()}` }}
       </button>
       <button class="fav" v-if="global.user" :disabled="global.user.id === 'filler'" @click="toggleFavourite">
         <img src="/public/svg/heart.svg" :class="{ active: isFavourite }" />
@@ -124,6 +130,7 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      padding: 0.25rem;
       position: relative;
       z-index: 2;
 
@@ -173,6 +180,7 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
       background: var(--bg-d);
       padding: 0.2rem 0.5rem;
       border-radius: 0.5rem;
+      color: var(--text-a);
       cursor: pointer;
     }
   }
@@ -192,6 +200,11 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
       display: flex;
       justify-content: center;
       align-items: center;
+
+      img {
+        filter: invert(var(--svg-invert));
+      }
+
     } :disabled {
       cursor: not-allowed;
     }
@@ -202,7 +215,7 @@ function setActiveColor(val: number, event: Event) { event.stopPropagation(); ac
       text-align: center;
       padding: 0.25rem 0;
       border-radius: 0.5rem;
-      background: var(--text-b);
+      background: var(--text-a);
       color: var(--bg-a);
       cursor: pointer;
     }

@@ -18,7 +18,7 @@ const activeColor = computed(() => filterState.state.filters.color);
 
 <template>
   <div class="filter-holder">
-    <div class="size">Colors</div>
+    <div class="size i18n" data-key="colors"></div>
     <sidebar_item 
       v-for="item in props.data_array" 
       :key="item" 
@@ -34,6 +34,9 @@ const activeColor = computed(() => filterState.state.filters.color);
 </template>
 
 <style scoped lang="scss">
+.size.i18n[data-key="colors"]::after {
+  content: var(--colors);
+}
 .filter-holder {
   display: flex;
   flex-direction: column;

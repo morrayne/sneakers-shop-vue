@@ -24,6 +24,12 @@ const product = ref<any>(null);
 const selected = reactive({ main_photo: 0, color: 0, size: "40.0" });
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 
+// Функция для получения переведенного текста
+function getTranslatedText(key: string) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`);
+  return value ? value.replace(/^"(.*)"$/, '$1') : key;
+}
+
 // Получаем текущий товар
 async function fetchProduct() {
   try {
@@ -109,15 +115,15 @@ onMounted(async () => {
           <div class="img-holder" v-for="value in 3" :key="value" @click="selected.main_photo = value - 1">
             <img :src="`/sneakers/${product?.id}-${product?.colors?.[selected.color]?.folder_name}/${value - 1}.jpg`" alt="" />
           </div>
-          <div class="filler">see more</div>
+          <div class="filler" v-if="false">{{ getTranslatedText('seeMore') }}</div>
         </div>
       </div>
       <div class="right">
         <div class="model-name">{{ product?.name }}</div>
         <div class="model-rating">
-          {{ product?.rating }} / 100 on {{ (product?.rating % 3).toFixed(0) }} reviews
+          {{ product?.rating }} / 100 {{ getTranslatedText('on') }} {{ (product?.rating % 3).toFixed(0) }} {{ getTranslatedText('reviews') }}
         </div>
-        <div class="model-cost">{{ product?.cost }}.00 rub</div>
+        <div class="model-cost">{{ product?.cost }}.00 {{ getTranslatedText('rub') }}</div>
         <div class="model-colors">
           <div class="img-wrapper" v-for="(color, index) in product?.colors" :key="index" @click="selected.color = index">
             <img :src="`/sneakers/${product?.id}-${color.folder_name}/0.jpg`" />
@@ -131,7 +137,7 @@ onMounted(async () => {
         <div class="duo-button">
           <button class="cart" @click="addToBasket()">
             <img src="/svg/bag.svg" alt="" />
-            <span>Add to cart</span>
+            <span>{{ getTranslatedText('addToCart') }}</span>
           </button>
           <button class="favourite" @click="addToFavourite()">
             <img src="/svg/heart.svg" alt="" />

@@ -8,6 +8,7 @@ import header_main from "../../common/header/header_main.vue";
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
 import registration_form from "./no_auth/registration_form.vue";
 import left_main from "./auth/left.vue";
+import history_main from "./auth/history_main.vue";
 </script>
 
 <template>
@@ -19,6 +20,7 @@ import left_main from "./auth/left.vue";
       </div>
       <div :class="global.user && global.user.id !== 'Guest' ? 'chopped-right' : 'full-right'">
         <registration_form v-if="global.user && global.user.id === 'Guest'" />
+        <history_main v-else />
       </div>
     </main>
   </wrapper_main>

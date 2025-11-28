@@ -26,7 +26,7 @@ function handleinput(event: Event) {
 </script>
 
 <template>
-  <input type="text" class="search" placeholder="Nike Air Max 95" @input="handleinput($event)" />
+  <input type="text" class="search" placeholder="Nike Air Max Plus" @input="handleinput($event)" />
   <sidebar_main_filter />
   <sidebar_main_colors :data_array="props.color_array" />
   <sidebar_main_genders :data_array="props.gender_array" />

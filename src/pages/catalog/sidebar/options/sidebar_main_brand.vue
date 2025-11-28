@@ -18,12 +18,15 @@ const activeBrand = computed(() => filterState.state.filters.brand);
 
 <template>
   <div class="filter-holder">
-    <div class="size">Brand</div>
+    <div class="size i18n" data-key="brand"></div>
     <sidebar_item v-for="item in props.data_array" :key="item" :name="item" :val="item" :display_color="false" :color="'#000'" :active="activeBrand === item" :direction="false" @was-clicked="() => filterState.methods.setFilter('brand', item)" />
   </div>
 </template>
 
 <style scoped lang="scss">
+.size.i18n[data-key="brand"]::after {
+  content: var(--brand);
+}
 .filter-holder {
   display: flex;
   flex-direction: column;

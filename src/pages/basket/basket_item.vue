@@ -27,6 +27,12 @@ interface BasketItem {
 const props = defineProps<{ data: BasketItem }>();
 const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
 
+// Функция для получения переведенной валюты
+function getTranslatedRub() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--rub');
+  return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
+}
+
 // vars
 const loading = ref(false);
 
@@ -79,7 +85,7 @@ async function removeFromBasket() {
         <div class="stag">{{ props.data.favouriteSize }}</div>
         <div class="stag">{{ props.data.rating }} / 100</div>
       </div>
-      <div class="movetobasket">{{ props.data.cost }} rub</div>
+      <div class="movetobasket">{{ props.data.cost }} {{ getTranslatedRub() }}</div>
     </div>
   </div>
 </template>
@@ -105,8 +111,8 @@ async function removeFromBasket() {
       border-radius: 0.25rem;
       padding: 0.25rem;
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 0.25rem;
+      right: 0.25rem;
       z-index: 2;
       cursor: pointer;
 
@@ -114,6 +120,7 @@ async function removeFromBasket() {
         width: 1.5rem;
         aspect-ratio: 1 / 1;
         margin: 0.25rem;
+        filter: invert(var(--svg-invert));
       }
     }
 
@@ -153,7 +160,7 @@ async function removeFromBasket() {
   }
 
   .name {
-    margin: 0 0 0.5rem;
+    margin: 0.5rem 0;
   }
 
   .movetobasket {
@@ -161,7 +168,7 @@ async function removeFromBasket() {
     border-radius: 0.5rem;
     text-align: center;
     padding: 0.35rem 0;
-    background: var(--text-b);
+    background: var(--text-a);
     color: var(--bg-a);
     cursor: pointer;
   }
