@@ -160,20 +160,10 @@ watch(
         <div v-if="loading" class="loa">
           <loading_main />
         </div>
-
-        <basket_item
-          v-else-if="basketItems.length > 0"
-          v-for="item in basketItems"
-          :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`"
-          :data="item"
-          @item-removed="handleItemRemoved"
-        />
+        <basket_item v-else-if="basketItems.length > 0" v-for="item in basketItems" :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`" :data="item" @item-removed="handleItemRemoved" />
         <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
-          <p v-if="global.user?.id && global.user.id !== 'Guest'">
-            {{ getTranslatedText('emptyBasket') }}
-          </p>
-          <p v-else>{{ getTranslatedText('notAuthorized') }}</p>
+          <p> {{ getTranslatedText('emptyBasket') }} </p>
         </div>
       </div>
       <div class="right" v-if="!loading && basketItems.length > 0">

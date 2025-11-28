@@ -62,6 +62,11 @@ watch(() => global.user?.favourite, () => {
     fetchFavs();
   }}, { deep: true }
 );
+
+function getTranslatedText(key: string) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`);
+  return value ? value.replace(/^"(.*)"$/, '$1') : key;
+}
 </script>
 
 <template>
@@ -71,17 +76,10 @@ watch(() => global.user?.favourite, () => {
       <div v-if="loading" class="loa">
         <loading_main />
       </div>
-      <favourite_item
-        v-else-if="!loading && global.user && global.user.favourite?.length !== 0"
-        v-for="item in global.user?.favourite"
-        :key="`${item.id}-${item.color}`"
-        :data="item"
-        :sneaker="sneakers.find((s: any) => s.id === item.id)"
-        @item-removed="handleItemRemoved"
-      />
+      <favourite_item v-else-if="!loading && global.user && global.user.favourite?.length !== 0" v-for="item in global.user?.favourite" :key="`${item.id}-${item.color}`" :data="item" :sneaker="sneakers.find((s: any) => s.id === item.id)" @item-removed="handleItemRemoved" />
       <div v-else-if="!loading && (!global.user || !global.user.favourite || global.user.favourite.length === 0)" class="loa">
         <img src="/public/gif/evernight.gif" alt="No items" />
-        <p>No sneakers in favourite</p>
+        <p> {{ getTranslatedText('emptyFavourite') }} </p>
       </div>
     </main>
   </wrapper_main>

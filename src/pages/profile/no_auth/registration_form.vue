@@ -18,6 +18,12 @@ const data = reactive({
   icon: 1,
 })
 
+// функция для получения локализованного текста из CSS переменных
+const getLocalizedText = (key: string): string => {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`).trim();
+  return value.replace(/^["']|["']$/g, '');
+}
+
 // регистрация
 async function handleSubmit(e: Event) {
   e.preventDefault()
@@ -86,15 +92,15 @@ function toggleMode() { mode.value = mode.value === "login" ? "register" : "logi
   <form @submit="handleSubmit">
     <input type="email" v-model="data.email" placeholder="example@mail.com" required />
     <input type="password" v-model="data.password" placeholder="******" required />
-    <input v-if="mode === 'register'" type="text" v-model="data.name" placeholder="How should we call you?" required />
+    <input v-if="mode === 'register'" type="text" v-model="data.name" :placeholder="getLocalizedText('placeholderReg')" required />
     <div v-if="mode === 'register'" class="avatar-grid">
       <div v-for="index in 20" :key="index" :class="['avatar-option', { active: data.icon === index }]" @click="data.icon = index">
         <img :src="`/profile/${index - 1}.jpg`" />
       </div>
     </div>
-    <button class="reg" type="submit">{{ mode === "login" ? "Login" : "Register" }}</button>
-    <button type="button" @click="toggleMode">
-      {{ mode === "login" ? "No account? Go to registration" : "Already have account? Go to login" }}
+    <button class="reg" type="submit">{{ mode === "login" ? getLocalizedText('login') : getLocalizedText('register') }}</button>
+    <button type="button" class="switch" @click="toggleMode">
+      {{ mode === "login" ? getLocalizedText('noAcc') : getLocalizedText('alreadyAcc') }}
     </button>
   </form>
 </template>

@@ -317,8 +317,14 @@ svg {
   --order: "Заказ";
   --totalCost: "Общая стоимость";
   --emptyBasket: "Корзина пуста";
+  --emptyFavourite: "Избранных нет";
   --notAuthorized: "Вы не авторизованы";
   --makePurchase: "Оформить заказ";
+  --noAcc: "Нет аккаунта? Давайте зарегистрируем";
+  --alreadyAcc: "Уже есть аккаунт? Давайте войдем";
+  --placeholderReg: "Как нам к вам обращаться?";
+  --login: "Войти";
+  --register: "Зарегестрироваться";
 }
 
 :root[lang=en] {
@@ -358,6 +364,12 @@ svg {
   --order: "Order";
   --totalCost: "Total cost";
   --emptyBasket: "No sneakers in basket";
+  --emptyFavourite: "No sneakers in favourite";
   --notAuthorized: "You are not authorized";
   --makePurchase: "Make purchase";
+  --noAcc: "No account? Go to registration";
+  --alreadyAcc: "Already have account? Go to login";
+  --placeholderReg: "How should we call you?";
+  --login: "Login";
+  --register: "Register";
 }/*# sourceMappingURL=main.css.map */
