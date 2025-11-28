@@ -1,13 +1,13 @@
 <script setup lang="ts">
 // vue
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 //
 import header_home from "../../common/header/header_home.vue";
 import wrapper_home from "../../common/wrapper/wrapper_home.vue";
 
 // data
-const active = ref(0);
+const active = ref(localStorage.getItem('homeTheme'));
 const data = ref([
   {
     folderName: 'green',
@@ -35,12 +35,60 @@ const data = ref([
   }
 ]);
 
-// 
-function changeA(num: number) {
+// Находим активную тему по folderName
+const findActiveThemeIndex = () => {
+  return data.value.findIndex(item => item.folderName === active.value);
+};
+
+// Функция для применения темы
+const applyTheme = (folderName: string | null) => {
   const htmlElement = document.documentElement;
-  htmlElement.setAttribute('data-home-theme', data.value[num]!.folderName);
-  active.value = num;
+  if (folderName) {
+    htmlElement.setAttribute('data-home-theme', folderName);
+  } else {
+    // Если тема не установлена, применяем первую по умолчанию
+    htmlElement.setAttribute('data-home-theme', data.value[0]!.folderName);
+    active.value = data.value[0]!.folderName;
+  }
+};
+
+// Функция смены темы
+function changeTheme(index: number) {
+  const theme = data.value[index];
+  if (theme) {
+    active.value = theme.folderName;
+    localStorage.setItem('homeTheme', theme.folderName);
+    applyTheme(theme.folderName);
+  }
 }
+
+// Следим за изменениями в localStorage
+const handleStorageChange = () => {
+  const newTheme = localStorage.getItem('homeTheme');
+  if (newTheme !== active.value) {
+    active.value = newTheme;
+    applyTheme(newTheme);
+  }
+};
+
+// Инициализация при загрузке компонента
+
+  window.addEventListener('storage', handleStorageChange);
+
+
+// Следим за изменениями active
+watch(active, (newTheme) => {
+  applyTheme(newTheme);
+});
+
+// Получаем путь к изображению для текущей темы
+const getSneakerImagePath = () => {
+  const themeIndex = findActiveThemeIndex();
+  if (themeIndex !== -1) {
+    return `/home/${data.value[themeIndex]!.folderName}/sneaker.png`;
+  }
+  return `/home/${data.value[0]!.folderName}/sneaker.png`;
+};
 </script>
 
 <template>
@@ -61,11 +109,18 @@ function changeA(num: number) {
           <p>sneakers shop vue</p>
           <p>created by 4lyne</p>
         </div>
-        <img class="main-sneaker" :src="`/home/${active}/sneaker.png`"></img>
+        <img class="main-sneaker" :src="getSneakerImagePath()" alt="Nike Air Max Plus">
       </h1>
       <div class="bottom">
         <div class="line"></div>
-        <div class="card" v-for="(item, index) in data" :key="index" @click="changeA(index)" :style="{ background: `linear-gradient(-45deg, ${item.color1}, ${item.color2})` }">
+        <div 
+          class="card" 
+          v-for="(item, index) in data" 
+          :key="index" 
+          @click="changeTheme(index)" 
+          :style="{ background: `linear-gradient(-45deg, ${item.color1}, ${item.color2})` }"
+          :class="{ active: item.folderName === active }"
+        >
           {{ item.characterName }}
         </div>
       </div>

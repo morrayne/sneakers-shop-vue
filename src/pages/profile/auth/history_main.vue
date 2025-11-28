@@ -4,6 +4,7 @@ import { ref, onMounted, computed } from "vue";
 
 // components
 import history_item from "./history_item.vue";
+import loading_main from "../../../common/loading/loading_main.vue";
 
 // pinia & supabase
 import { supabase } from "../../../helper/imp/supabase";
@@ -65,7 +66,7 @@ onMounted(fetchHistory);
 <template>
   <main :class="loading ? 'center' : 'default'">
     <div v-if="loading" class="loa">
-      <p>{{ getTranslatedText('loading') }}</p>
+      <loading_main />
     </div>
     <div v-else-if="!adaptedHistory || adaptedHistory.length === 0" class="loa">
       <img src="/public/gif/evernight.gif" alt="No items" />

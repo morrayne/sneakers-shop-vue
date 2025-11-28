@@ -3,7 +3,6 @@
 <template>
   <div class="loading-wrapper">
     <div class="spinner"></div>
-    <p>Loading in progress</p>
   </div>
 </template>
 

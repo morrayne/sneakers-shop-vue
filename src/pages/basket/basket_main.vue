@@ -34,7 +34,6 @@ function getTranslatedRub() {
   return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
 }
 
-// ----------------------
 // загрузка всех кроссовок (для отображения корзины)
 async function loadSneakers() {
   loading.value = true;
@@ -54,7 +53,6 @@ async function loadSneakers() {
   }
 }
 
-// ----------------------
 // вычисляемая корзина напрямую из Pinia
 const basketItems = computed(() => {
   const user = global.user;
@@ -170,7 +168,6 @@ watch(
           :data="item"
           @item-removed="handleItemRemoved"
         />
-
         <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
           <p v-if="global.user?.id && global.user.id !== 'Guest'">
@@ -179,7 +176,6 @@ watch(
           <p v-else>{{ getTranslatedText('notAuthorized') }}</p>
         </div>
       </div>
-
       <div class="right" v-if="!loading && basketItems.length > 0">
         <div
           class="vfv"
