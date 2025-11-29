@@ -50,7 +50,7 @@ async function handleSubmit(e: Event) {
         const updates: any = {};
         if (savedFavourite.length > 0) updates.favourite = savedFavourite;
         if (savedBasket.length > 0) updates.basket = savedBasket;
-        const { data: updateResult, error } = await supabase.from("profiles").update(updates).eq("id", userId).select();
+        const { data: error } = await supabase.from("profiles").update(updates).eq("id", userId).select();
         if (error) {
           console.error("❌ Ошибка обновления профиля:", error);
         } else {
