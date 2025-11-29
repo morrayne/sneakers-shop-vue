@@ -71,6 +71,7 @@ main .right {
 main .right .model-name {
   font-size: 3rem;
   font-weight: 300;
+  white-space: nowrap;
 }
 main .right .model-rating {
   color: var(--text-c);
@@ -159,6 +160,233 @@ main .right .duo-button :disabled {
   cursor: not-allowed;
 }
 
+/* Планшеты */
+@media (max-width: 1024px) {
+  main {
+    gap: 2rem;
+  }
+  main .left {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+  main .left .tags {
+    gap: 0.8rem;
+  }
+  main .left .tags .tag {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+  }
+  main .left .img-wrapper {
+    gap: 0.8rem;
+  }
+  main .right {
+    padding-top: 2.5rem;
+  }
+  main .right .model-name {
+    font-size: 2.5rem;
+  }
+  main .right .model-cost {
+    font-size: 3rem;
+  }
+  main .right .model-colors {
+    margin-top: 1.5rem;
+    gap: 0.8rem;
+  }
+  main .right .model-colors .img-wrapper {
+    width: 5rem;
+  }
+  main .right .model-sizes {
+    margin-top: 1.5rem;
+    max-width: 18rem;
+  }
+  main .right .model-sizes .size, main .right .model-sizes .active-size {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+  }
+  main .right .duo-button {
+    margin-top: 1.5rem;
+    gap: 0.8rem;
+  }
+  main .right .duo-button .cart {
+    width: 24rem;
+    padding: 0.4rem 0;
+    gap: 1.5rem;
+  }
+  main .right .duo-button .cart img {
+    height: 1.8rem;
+  }
+  main .right .duo-button .favourite {
+    padding: 0.4rem;
+  }
+  main .right .duo-button .favourite img {
+    height: 1.8rem;
+  }
+}
+/* Маленькие планшеты */
+@media (max-width: 768px) {
+  main {
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between !important;
+    gap: 1rem;
+    overflow: scroll;
+  }
+  main .left {
+    height: auto;
+    padding: 0.6rem;
+    gap: 0.6rem;
+  }
+  main .left .tags {
+    gap: 0.6rem;
+  }
+  main .left .tags .tag {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.3rem;
+  }
+  main .left .main-img {
+    height: auto;
+    max-height: 50vh;
+  }
+  main .left .img-wrapper {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+  }
+  main .right {
+    min-width: 100%;
+    padding: 0.4rem;
+    gap: 0.4rem;
+  }
+  main .right .model-name {
+    font-size: 1.5rem;
+  }
+  main .right .model-cost {
+    font-size: 2.5rem;
+  }
+  main .right .model-colors {
+    margin-top: 1rem;
+    gap: 0.6rem;
+  }
+  main .right .model-colors .img-wrapper {
+    width: 4rem;
+  }
+  main .right .model-sizes {
+    margin-top: 1rem;
+    max-width: 100%;
+  }
+  main .right .model-sizes .size, main .right .model-sizes .active-size {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.3rem;
+  }
+  main .right .duo-button {
+    margin-top: 1rem;
+    gap: 0.6rem;
+  }
+  main .right .duo-button .cart {
+    width: 100%;
+    padding: 0.3rem 0;
+    gap: 1rem;
+  }
+  main .right .duo-button .cart img {
+    height: 1.5rem;
+  }
+  main .right .duo-button .favourite {
+    padding: 0.3rem;
+  }
+  main .right .duo-button .favourite img {
+    height: 1.5rem;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* Телефоны */
+@media (max-width: 480px) {
+  main {
+    gap: 0;
+  }
+  main .left {
+    padding: 0.4rem;
+    gap: 0.4rem;
+  }
+  main .left .tags {
+    gap: 0.4rem;
+  }
+  main .left .tags .tag {
+    font-size: 0.65rem;
+    padding: 0.08rem 0.25rem;
+  }
+  main .left .img-wrapper {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+  }
+  main .right {
+    padding: 0.4rem;
+    gap: 0.4rem;
+  }
+  main .right .model-name {
+    font-size: 1.5rem;
+  }
+  main .right .model-cost {
+    font-size: 2rem;
+  }
+  main .right .model-colors {
+    margin-top: 0.8rem;
+    gap: 0.4rem;
+  }
+  main .right .model-colors .img-wrapper {
+    width: 3rem;
+  }
+  main .right .model-sizes {
+    margin-top: 0.8rem;
+  }
+  main .right .model-sizes .size, main .right .model-sizes .active-size {
+    font-size: 0.65rem;
+    padding: 0.08rem 0.25rem;
+  }
+  main .right .duo-button {
+    margin-top: 0.8rem;
+    gap: 0.4rem;
+  }
+  main .right .duo-button .cart {
+    padding: 0.25rem 0;
+    gap: 0.8rem;
+  }
+  main .right .duo-button .cart img {
+    height: 1.2rem;
+  }
+  main .right .duo-button .favourite {
+    padding: 0.25rem;
+  }
+  main .right .duo-button .favourite img {
+    height: 1.2rem;
+  }
+}
+/* Маленькие телефоны */
+@media (max-width: 360px) {
+  main .left {
+    padding: 0.3rem;
+  }
+  main .left .img-wrapper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  main .right {
+    padding: 0.4rem;
+    gap: 0.4rem;
+  }
+  main .right .model-name {
+    font-size: 1.2rem;
+  }
+  main .right .model-cost {
+    font-size: 1.5rem;
+  }
+  main .right .model-colors .img-wrapper {
+    width: 2.5rem;
+  }
+  main .right .duo-button .cart img,
+  main .right .duo-button .favourite img {
+    height: 1rem;
+  }
+}
 :root {
   --font-jetbrains-mono: "JetBrains Mono", monospace;
 }
@@ -325,6 +553,9 @@ svg {
   --placeholderReg: "Как нам к вам обращаться?";
   --login: "Войти";
   --register: "Зарегестрироваться";
+  --passErr: "Пароль должен быть минимум из 6 символов";
+  --nameErr: "Пароль должно быть минимум из 3 символов";
+  --reuseErr: "Такая почта уже занята";
 }
 
 :root[lang=en] {
@@ -372,4 +603,7 @@ svg {
   --placeholderReg: "How should we call you?";
   --login: "Login";
   --register: "Register";
+  --passErr: "Password should contain at least 6 digits";
+  --nameErr: "Name should contain at least 3 digits";
+  --reuseErr: "Email already taken";
 }/*# sourceMappingURL=main.css.map */

@@ -8,7 +8,7 @@ const global = useGlobalState()
 <template>
   <div class="prof">
     <div v-if="global.user" class="id">{{ global.user.name }}</div>
-    <div v-if="global.user" class="id">{{ global.user.id }}</div>
+    <!-- <div v-if="global.user" class="id">{{ global.user.id }}</div> -->
     <img v-if="global.user" :src="`/profile/${global.user.icon}.jpg`" alt="user icon" />
     <button class="log-out i18n" @click="logoutUser" data-key="logout"></button>
   </div>

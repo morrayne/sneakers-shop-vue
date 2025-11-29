@@ -22,7 +22,9 @@ async function fetchUnique<T>(column: string): Promise<T[]> {
     data.forEach((item: any) => {
       const val = item[column];
       if (Array.isArray(val)) {
-        val.forEach((v: any) => { if (v.folder_name) values.add(v.folder_name); });
+        val.forEach((v: any) => {
+          if (v.folder_name) values.add(v.folder_name);
+        });
       } else if (val) {
         values.add(val);
       }
@@ -57,7 +59,11 @@ const everything = reactive({
 async function initializeData() {
   loading.value = true;
   try {
-    const [colors, brands, genders] = await Promise.all([fetchColors(), fetchBrands(), fetchGenders()]);
+    const [colors, brands, genders] = await Promise.all([
+      fetchColors(),
+      fetchBrands(),
+      fetchGenders(),
+    ]);
     color_array.push("all", ...colors);
     brand_array.push("all", ...brands);
     gender_array.push("all", ...genders);
@@ -69,19 +75,33 @@ async function initializeData() {
 }
 
 // функции для управления состоянием
-function setSearch(query: string) { everything.search = query; }
-function setSortBy(sortBy: string) {
-  if (everything.sortBy === sortBy) everything.sortOrder = everything.sortOrder === "asc" ? "desc" : "asc";
-  else { everything.sortBy = sortBy; everything.sortOrder = "asc"; }
+function setSearch(query: string) {
+  everything.search = query;
 }
-function setSortOrder(order: "asc" | "desc") { everything.sortOrder = order; }
-function setFilter(type: "color" | "gender" | "brand", value: string) { everything.filters[type] = value; }
+function setSortBy(sortBy: string) {
+  if (everything.sortBy === sortBy)
+    everything.sortOrder = everything.sortOrder === "asc" ? "desc" : "asc";
+  else {
+    everything.sortBy = sortBy;
+    everything.sortOrder = "asc";
+  }
+}
+function setSortOrder(order: "asc" | "desc") {
+  everything.sortOrder = order;
+}
+function setFilter(type: "color" | "gender" | "brand", value: string) {
+  everything.filters[type] = value;
+}
 
 // монтирование
 onMounted(() => initializeData());
 
 // provide для sidebar и list
-provide("filterState", {state: everything, arrays: { colors: color_array, brands: brand_array, genders: gender_array }, methods: { setSearch, setSortBy, setSortOrder, setFilter }});
+provide("filterState", {
+  state: everything,
+  arrays: { colors: color_array, brands: brand_array, genders: gender_array },
+  methods: { setSearch, setSortBy, setSortOrder, setFilter },
+});
 </script>
 
 <template>
@@ -89,7 +109,17 @@ provide("filterState", {state: everything, arrays: { colors: color_array, brands
     <header_main />
     <main>
       <div class="left">
-        <sidebar_main v-if="!loading && color_array.length !== 0 && brand_array.length !== 0 && gender_array.length !== 0" :color_array="color_array" :brand_array="brand_array" :gender_array="gender_array" />
+        <sidebar_main
+          v-if="
+            !loading &&
+            color_array.length !== 0 &&
+            brand_array.length !== 0 &&
+            gender_array.length !== 0
+          "
+          :color_array="color_array"
+          :brand_array="brand_array"
+          :gender_array="gender_array"
+        />
         <sidebar_filler v-else />
       </div>
       <div class="right">
@@ -101,11 +131,13 @@ provide("filterState", {state: everything, arrays: { colors: color_array, brands
 
 <style scoped lang="scss">
 main {
-  height: calc(100% - 4rem);
+  height: 100%;
   display: flex;
+  overflow: hidden;
 
   .left {
     width: 18rem;
+    min-height: 16rem;
     padding: 1rem;
     border-right: solid 0.125rem var(--bg-c);
     display: flex;
@@ -126,6 +158,108 @@ main {
   }
   ::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Планшеты горизонтальные */
+@media (max-width: 1720px) {
+  main {
+    .right {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+/* Планшеты */
+@media (max-width: 1480px) {
+  main {
+    .right {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+/* Маленькие планшеты */
+@media (max-width: 1180px) {
+  main {
+    .left {
+      max-width: 16rem;
+      height: 100%;
+    }
+    
+    .right {
+      width: 100%;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+/* Большие телефоны */
+@media (max-width: 1024px) {
+  main {
+    .right {
+      gap: 0.8rem;
+      padding: 0.8rem;
+    }
+    
+    .left {
+      padding: 0.8rem;
+      gap: 0.8rem;
+    }
+  }
+}
+
+/* Телефоны */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+
+    .right {
+      width: 100%;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      padding: 0.6rem;
+    }
+    
+    .left {
+      max-width: unset;
+      width: 100%;
+      padding: 0.6rem;
+      gap: 0.6rem;
+      max-height: 18rem;
+    }
+  }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 480px) {
+  main {
+    .right {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+    
+    .left {
+      padding: 0.5rem;
+      gap: 0.5rem;
+      max-height: 16rem;
+    }
+  }
+}
+
+/* Очень маленькие телефоны */
+@media (max-width: 360px) {
+  main {
+    .right {
+      padding: 0.4rem;
+      gap: 0.4rem;
+    }
+    
+    .left {
+      padding: 0.4rem;
+      gap: 0.4rem;
+    }
   }
 }
 </style>

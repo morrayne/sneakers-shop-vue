@@ -148,6 +148,7 @@ async function removeFromBasket() {
     display: flex;
     gap: 0.5rem;
     margin: 0 0 0.5rem;
+    white-space: nowrap;
 
     .stag {
       padding: 0.2rem 0.5rem;
@@ -171,6 +172,114 @@ async function removeFromBasket() {
     background: var(--text-a);
     color: var(--bg-a);
     cursor: pointer;
+  }
+}
+
+/* Планшеты */
+@media (max-width: 1024px) {
+  .item {
+    padding: 0.8rem;
+
+    .img-wrapper .bin {
+      width: 1.8rem;
+      height: 1.8rem;
+      
+      img {
+        width: 1.3rem;
+      }
+    }
+
+    .sdf {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.4rem;
+    }
+
+    .stags {
+      gap: 0.4rem;
+      
+      .stag {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.4rem;
+      }
+    }
+
+    .movetobasket {
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Маленькие планшеты */
+@media (max-width: 768px) {
+  .item {
+    padding: 0.6rem;
+    border-radius: 0.8rem;
+
+    .img-wrapper .bin {
+      width: 1.6rem;
+      height: 1.6rem;
+      top: 0.2rem;
+      right: 0.2rem;
+      
+      img {
+        width: 1.1rem;
+      }
+    }
+
+    .sdf {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.3rem;
+    }
+
+    .stags {
+      gap: 0.3rem;
+      
+      .stag {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.3rem;
+      }
+    }
+
+    .movetobasket {
+      padding: 0.25rem 0;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* Телефоны */
+@media (max-width: 480px) {
+  .item {
+    padding: 0.5rem;
+
+    .img-wrapper .bin {
+      width: 1.4rem;
+      height: 1.4rem;
+      
+      img {
+        width: 1rem;
+      }
+    }
+
+    .sdf {
+      font-size: 0.65rem;
+      padding: 0.08rem 0.25rem;
+    }
+
+    .stags {
+      gap: 0.25rem;
+      
+      .stag {
+        font-size: 0.65rem;
+        padding: 0.08rem 0.25rem;
+      }
+    }
+
+    .movetobasket {
+      padding: 0.2rem 0;
+      font-size: 0.75rem;
+    }
   }
 }
 </style>

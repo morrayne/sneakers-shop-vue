@@ -74,7 +74,3 @@ const displayedSneakers = computed(() => {
   <list_filler v-if="loading" v-for="value in 20" :key="value" />
   <list_card_main v-else v-for="item in displayedSneakers" :key="item.id" :data="item" class="card" />
 </template>
-
-<style scoped lang="scss">
-
-</style>

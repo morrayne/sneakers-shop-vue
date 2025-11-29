@@ -36,14 +36,18 @@ const props = defineProps<{
 
 // Функция для получения переведенного текста
 function getTranslatedText(key: string): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`);
-  return value ? value.replace(/^"(.*)"$/, '$1') : key;
+  const value = getComputedStyle(document.documentElement).getPropertyValue(
+    `--${key}`
+  );
+  return value ? value.replace(/^"(.*)"$/, "$1") : key;
 }
 
 // Функция для получения переведенной валюты
 function getTranslatedRub(): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue('--rub');
-  return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
+  const value = getComputedStyle(document.documentElement).getPropertyValue(
+    "--rub"
+  );
+  return value ? value.replace(/^"(.*)"$/, "$1") : "rub";
 }
 
 // Находим информацию о товарах в заказе
@@ -65,9 +69,12 @@ const totalCost = computed((): number => {
 <template>
   <div class="order">
     <div class="order-header">
-      <p>{{ getTranslatedText('order') }} #{{ order.id }}</p>
+      <p>{{ getTranslatedText("order") }} #{{ order.id }}</p>
       <p>{{ new Date(order.date).toLocaleDateString() }}</p>
-      <p>{{ getTranslatedText('totalCost') }}: {{ totalCost }} {{ getTranslatedRub() }}</p>
+      <p>
+        {{ getTranslatedText("totalCost") }}: {{ totalCost }}
+        {{ getTranslatedRub() }}
+      </p>
     </div>
     <div class="order-items">
       <div
@@ -87,10 +94,12 @@ const totalCost = computed((): number => {
           <img v-else src="/public/gif/evernight.gif" alt="No image" />
         </div>
         <div class="item-details">
-          <div class="name">{{ item.sneaker?.name || 'Товар' }}</div>
+          <div class="name">{{ item.sneaker?.name || "Товар" }}</div>
           <div class="color">{{ item.color }}</div>
           <div class="size">{{ item.size }}</div>
-          <div class="price">{{ item.sneaker?.cost || 0 }} {{ getTranslatedRub() }}</div>
+          <div class="price">
+            {{ item.sneaker?.cost || 0 }} {{ getTranslatedRub() }}
+          </div>
         </div>
       </div>
     </div>
@@ -105,23 +114,27 @@ const totalCost = computed((): number => {
   gap: 0.5rem;
 
   .order-header {
-    width: fit-content;
+    width: 100%;
     display: flex;
     gap: 0.5rem;
+    overflow: scroll;
 
     * {
       padding: 0.2rem 0.5rem;
       border-radius: 0.35rem;
       text-align: center;
       font-size: 0.8rem;
+      white-space: nowrap;
       color: var(--text-a);
       background: var(--bg-c);
     }
+  }::-webkit-scrollbar {
+    display: none;
   }
 
   .order-items {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 
     .order-item {
@@ -182,6 +195,30 @@ const totalCost = computed((): number => {
           border-radius: 0.5rem;
         }
       }
+    }
+  }
+}
+
+/* Планшеты */
+@media (max-width: 1660px) {
+  .order {
+    .order-items {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+/* Планшеты */
+@media (max-width: 1320px) {
+  .order {
+    .order-items {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+@media (max-width: 640px) {
+  .order {
+    .order-items {
+      grid-template-columns: repeat(1, 1fr);
     }
   }
 }

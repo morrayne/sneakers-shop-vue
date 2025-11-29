@@ -255,4 +255,78 @@ main {
     }
   }
 }
+
+/* Планшеты */
+@media (max-width: 1024px) {
+  main {
+    flex-direction: column-reverse;
+
+    .right {
+      width: 100%;
+      height: 14rem;
+      overflow: scroll;
+    }::-webkit-scrollbar {
+      display: none;
+    }
+
+    .normal {
+      width: 100%;
+      height: 100%;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      padding: 0.8rem;
+    }
+  }
+}
+
+/* Маленькие планшеты */
+@media (max-width: 768px) {
+  main {
+    .normal {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      padding: 0.6rem;
+    }
+
+    .loa p {
+      width: 16rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Телефоны */
+@media (max-width: 480px) {
+  main {
+    .normal {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+
+    .right {
+      font-size: 0.75rem;
+    }
+
+    .loa p {
+      width: 14rem;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 360px) {
+  main {
+    .normal {
+      padding: 0.4rem;
+      gap: 0.4rem;
+    }
+
+    .loa p {
+      width: 12rem;
+      font-size: 0.75rem;
+    }
+  }
+}
 </style>

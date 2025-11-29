@@ -172,6 +172,9 @@ svg {
   --placeholderReg: "Как нам к вам обращаться?";
   --login: "Войти";
   --register: "Зарегестрироваться";
+  --passErr: "Пароль должен быть минимум из 6 символов";
+  --nameErr: "Пароль должно быть минимум из 3 символов";
+  --reuseErr: "Такая почта уже занята";
 }
 
 :root[lang="en"] {
@@ -219,4 +222,7 @@ svg {
   --placeholderReg: "How should we call you?";
   --login: "Login";
   --register: "Register";
+  --passErr: "Password should contain at least 6 digits";
+  --nameErr: "Name should contain at least 3 digits";
+  --reuseErr: "Email already taken";
 }

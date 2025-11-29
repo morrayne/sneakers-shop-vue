@@ -37,4 +37,33 @@
     }
   }
 }
+
+/* Планшеты */
+@media (max-width: 1024px) {
+  .wrapper .background {
+    padding: 0.8rem;
+  }
+}
+
+/* Телефоны */
+@media (max-width: 768px) {
+  .wrapper .background {
+    padding: 0.6rem;
+
+    .content {
+      border-radius: 0.8rem;
+    }
+  }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 480px) {
+  .wrapper .background {
+    padding: 0.4rem;
+
+    .content {
+      border-radius: 0.6rem;
+    }
+  }
+}
 </style>

@@ -33,6 +33,28 @@ const activeBrand = computed(() => filterState.state.filters.brand);
 
   .size {
     font-size: 1.2rem;
+    margin: 0.25rem 0;
+  }
+}
+
+/* Планшеты */
+@media (max-width: 1024px) {
+  .filter-holder .size {
+    font-size: 1.1rem;
+  }
+}
+
+/* Телефоны */
+@media (max-width: 768px) {
+  .filter-holder .size {
+    font-size: 1rem;
+  }
+}
+
+/* Маленькие телефоны */
+@media (max-width: 480px) {
+  .filter-holder .size {
+    font-size: 0.9rem;
   }
 }
 </style>
