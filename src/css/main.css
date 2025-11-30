@@ -30,6 +30,19 @@ main .left .main-img {
   position: relative;
   overflow: hidden;
 }
+main .left .main-img .colors-c {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  gap: 1rem;
+  display: flex;
+  z-index: 3;
+}
+main .left .main-img .colors-c button {
+  width: 1rem;
+  aspect-ratio: 1/1;
+  border-radius: 0.25rem;
+}
 main .left .main-img img {
   width: 100%;
   position: absolute;

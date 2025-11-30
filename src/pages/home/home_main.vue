@@ -181,8 +181,8 @@ main {
     }
 
     .card {
-      width: 12rem;
-      height: 5rem;
+      padding: 0.5rem 2rem;
+      border-radius: 0 1rem 0 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -192,10 +192,10 @@ main {
       cursor: pointer;
       color: var(--main-header-text);
       outline: solid 2px var(--main-header-text);
-      font-weight: bold;
+      font-size: 1.5rem;
 
       &:hover {
-        bottom: 2rem;
+        bottom: 1rem;
       }
     }
   }
@@ -340,20 +340,6 @@ main {
 
   .bottom {
     flex-direction: column;
-  }
-}
-
-main .bottom {
-  gap: 1rem;
-
-  .card {
-    width: 5rem;
-    height: 2rem;
-    font-size: 0.6rem;
-
-    &:hover {
-      bottom: 0.5rem;
-    }
   }
 }
 

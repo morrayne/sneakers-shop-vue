@@ -109,6 +109,9 @@ onMounted(async () => {
           <div class="tag">{{ product.id }}</div>
         </div>
         <div class="main-img">
+          <div class="colors-c">
+            <button class="c" v-for="(value, index) in product.colors" :style="{background: value.folder_name}" @click="selected.color = index"></button>
+          </div>
           <img :src="`/sneakers/${product.id}-${product.colors?.[selected.color].folder_name}/${selected.main_photo}.jpg`" alt="" />
         </div>
         <div class="img-wrapper">

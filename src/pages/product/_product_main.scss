@@ -30,6 +30,21 @@ main {
       position: relative;
       overflow: hidden;
 
+      .colors-c {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        gap: 1rem;
+        display: flex;
+        z-index: 3;
+
+        button {
+          width: 1rem;
+          aspect-ratio: 1 / 1;
+          border-radius: 0.25rem;
+        }
+      }
+
       img {
         width: 100%;
         position: absolute;
