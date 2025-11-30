@@ -1,18 +1,17 @@
 <script setup lang="ts">
-// vue
+// vue 
 import { inject, computed } from "vue";
 
-// components
+// components & types
 import sidebar_item from "../sidebar_item.vue";
+import type { provide_everything } from '../../../../helper/types';
 
 // filterState получается через inject
-const filterState = inject("filterState") as any;
+const filterState = inject("filterState") as provide_everything;
 if (!filterState) { throw new Error("filterState is undefined! Проверьте provide в родителе.") }
 
-// props
+// props & vars
 const props = defineProps<{ data_array: string[] }>();
-
-// активный бренд
 const activeBrand = computed(() => filterState.state.filters.brand);
 </script>
 

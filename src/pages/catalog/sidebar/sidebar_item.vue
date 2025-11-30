@@ -1,13 +1,7 @@
 <script setup lang="ts">
-// props
-const props = defineProps<{
-  name: string;
-  val: string;
-  display_color: boolean;
-  color: string;
-  active: boolean;
-  direction: string | boolean;
-}>();
+// props & types
+const props = defineProps<sidebar_item>();
+import type { sidebar_item } from '../../../helper/types';
 
 // emits
 const emit = defineEmits<{ wasClicked: [value: string] }>();
@@ -18,9 +12,7 @@ function handleClick() { emit('wasClicked', props.val) }
   <div :class="props.active ? 'sidebar-item active' : 'sidebar-item'" @click="handleClick">
     <div class="text">{{ props.name }}</div>
     <div class="color" v-if="props.display_color" :style="{ background: `${props.color}` }"></div>
-    <div class="box" v-if="props.direction !== false">
-      {{ props.direction }}
-    </div>
+    <div class="box" v-if="props.direction !== false"> {{ props.direction }} </div>
   </div>
 </template>
 

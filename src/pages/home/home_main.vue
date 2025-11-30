@@ -2,37 +2,17 @@
 // vue
 import { ref, watch } from "vue";
 
-//
+// imports
 import header_home from "../../common/header/header_home.vue";
 import wrapper_home from "../../common/wrapper/wrapper_home.vue";
 
-// data
+// vars
 const active = ref(localStorage.getItem("homeTheme"));
 const data = ref([
-  {
-    folderName: "green",
-    characterName: "Anaxa",
-    color1: "#b7cfbe",
-    color2: "#94b19d",
-  },
-  {
-    folderName: "pink",
-    characterName: "Evernight",
-    color1: "#d9753b",
-    color2: "#87224f",
-  },
-  {
-    folderName: "blue",
-    characterName: "Cerydra",
-    color1: "#239dce",
-    color2: "#0c5096",
-  },
-  {
-    folderName: "yellow",
-    characterName: "Aglaea",
-    color1: "#facb3f",
-    color2: "#107720",
-  },
+  { folderName: "green", characterName: "Anaxa", color1: "#b7cfbe", color2: "#94b19d" },
+  { folderName: "pink", characterName: "Evernight", color1: "#d9753b", color2: "#87224f" },
+  { folderName: "blue", characterName: "Cerydra", color1: "#239dce", color2: "#0c5096" },
+  { folderName: "yellow", characterName: "Aglaea", color1: "#facb3f", color2: "#107720" },
 ]);
 
 // Находим активную тему по folderName
@@ -46,7 +26,6 @@ const applyTheme = (folderName: string | null) => {
   if (folderName) {
     htmlElement.setAttribute("data-home-theme", folderName);
   } else {
-    // Если тема не установлена, применяем первую по умолчанию
     htmlElement.setAttribute("data-home-theme", data.value[0]!.folderName);
     active.value = data.value[0]!.folderName;
   }
@@ -72,13 +51,10 @@ const handleStorageChange = () => {
 };
 
 // Инициализация при загрузке компонента
-
 window.addEventListener("storage", handleStorageChange);
 
 // Следим за изменениями active
-watch(active, (newTheme) => {
-  applyTheme(newTheme);
-});
+watch(active, (newTheme) => { applyTheme(newTheme) });
 
 // Получаем путь к изображению для текущей темы
 const getSneakerImagePath = () => {
@@ -106,24 +82,11 @@ const getSneakerImagePath = () => {
           <p>sneakers shop vue</p>
           <p>created by 4lyne</p>
         </div>
-        <img
-          class="main-sneaker"
-          :src="getSneakerImagePath()"
-          alt="Nike Air Max Plus"
-        />
+        <img class="main-sneaker" :src="getSneakerImagePath()" alt="Nike Air Max Plus" />
       </h1>
       <div class="bottom">
         <div class="line"></div>
-        <div
-          class="card"
-          v-for="(item, index) in data"
-          :key="index"
-          @click="changeTheme(index)"
-          :style="{
-            background: `linear-gradient(-45deg, ${item.color1}, ${item.color2})`,
-          }"
-          :class="{ active: item.folderName === active }"
-        >
+        <div class="card" v-for="(item, index) in data" :key="index" @click="changeTheme(index)" :style="{ background: `linear-gradient(-45deg, ${item.color1}, ${item.color2})` }" :class="{ active: item.folderName === active }">
           {{ item.characterName }}
         </div>
       </div>

@@ -25,13 +25,8 @@ function getTranslatedText(key: string) {
 // Адаптируем историю под нужный формат
 const adaptedHistory = computed(() => {
   if (!global.user?.history) return [];
-  
   return global.user.history.map((order: any) => {
-    // Если order уже имеет правильную структуру
-    if (order.items && order.date) {
-      return order;
-    }
-    // Если это старый формат, создаем новую структуру
+    if (order.items && order.date) { return order }
     return {
       id: order.id || Date.now(),
       date: order.date || new Date().toISOString(),
@@ -47,9 +42,7 @@ async function fetchHistory() {
   loading.value = true;
   error.value = null;
   try {
-    const { data, error: supabaseError } = await supabase
-      .from("sneakers")
-      .select("*");
+    const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
     sneakers.value = data;
     if (supabaseError) throw supabaseError;
   } catch (err: any) {
@@ -60,6 +53,7 @@ async function fetchHistory() {
   }
 }
 
+// при монтировании
 onMounted(fetchHistory);
 </script>
 
@@ -73,12 +67,7 @@ onMounted(fetchHistory);
       <p>{{ getTranslatedText('emptyOrderHistory') }}</p>
     </div>
     <div v-else class="history-list">
-      <history_item
-        v-for="order in adaptedHistory"
-        :key="order.id"
-        :order="order"
-        :sneakers="sneakers"
-      />
+      <history_item v-for="order in adaptedHistory" :key="order.id" :order="order" :sneakers="sneakers" />
     </div>
   </main>
 </template>

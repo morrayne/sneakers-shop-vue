@@ -14,7 +14,8 @@ import { supabase } from "../../helper/imp/supabase";
 import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
-// types
+// types & vars
+const totalCost = computed(() => { return basketItems.value.reduce((sum, item) => sum + (item.cost || 0), 0) });
 import type { sneaker_color, product_item } from "../../helper/types";
 
 // state
@@ -34,16 +35,15 @@ function getTranslatedRub() {
   return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
 }
 
-// загрузка всех кроссовок (для отображения корзины)
+// загрузка всех кроссовок
 async function loadSneakers() {
   loading.value = true;
   error.value = null;
   try {
     const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
     if (supabaseError) throw supabaseError;
-
     const map = new Map<number, any>();
-    data?.forEach((item) => map.set(item.id, item));
+    data.forEach((item) => map.set(item.id, item));
     sneakersMap.value = map;
   } catch (err: any) {
     console.error("Ошибка загрузки корзины:", err);
@@ -58,57 +58,37 @@ const basketItems = computed(() => {
   const user = global.user;
   if (!user) return [];
   if (!user.basket || user.basket.length === 0) return [];
-
-  return user.basket
-    .map((basketItem: product_item) => {
-      const sneaker = sneakersMap.value.get(basketItem.id);
-      if (!sneaker) return null;
-      const colors = sneaker.colors as sneaker_color[];
-      const colorIndex = typeof basketItem.color === "number" ? basketItem.color : colors.findIndex((c) => c.name === basketItem.color);
-      return {
-        ...sneaker,
-        favouriteColor: colorIndex >= 0 ? colorIndex : 0,
-        favouriteSize: basketItem.size,
-      };
-    })
-    .filter(Boolean);
+  return user.basket.map((basketItem: product_item) => {
+    const sneaker = sneakersMap.value.get(basketItem.id);
+    if (!sneaker) return null;
+    const colors = sneaker.colors as sneaker_color[];
+    const colorIndex = typeof basketItem.color === "number" ? basketItem.color : colors.findIndex((c) => c.name === basketItem.color);
+    return { ...sneaker, favouriteColor: colorIndex >= 0 ? colorIndex : 0, favouriteSize: basketItem.size };
+  }).filter(Boolean);
 });
 
-// ----------------------
 // удаление элемента из корзины
 async function handleItemRemoved(itemId: number, colorIndex: number, size: string) {
   const user = global.user;
   if (!user) return;
-
   const updatedBasket = user.basket.filter((item: product_item) => {
     const sameId = item.id === itemId;
     const sameSize = item.size === size;
-    
-    // Сравниваем цвет через индекс или имя
-    const itemColorIndex = typeof item.color === "number" 
-      ? item.color 
-      : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
-    
+    const itemColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
     return !(sameId && sameSize && itemColorIndex === colorIndex);
   });
-
-  if (user.id === "Guest") {
+  if (user.id === "Guest") { 
     global.updateUserField("basket", updatedBasket);
-  } else {
-    await updateUserField("basket", updatedBasket);
+  } 
+  else { 
+    await updateUserField("basket", updatedBasket)
   }
 }
-
-// общая стоимость
-const totalCost = computed(() => {
-  return basketItems.value.reduce((sum, item) => sum + (item.cost || 0), 0);
-});
 
 // 📦 ПЕРЕМЕЩЕНИЕ КОРЗИНЫ В ИСТОРИЮ ЗАКАЗОВ
 async function moveBasketToHistory() {
   const user = global.user;
   if (!user || !user.basket || user.basket.length === 0) return;
-  
   try {
     const order = {
       id: Date.now(),
@@ -117,19 +97,14 @@ async function moveBasketToHistory() {
       total: totalCost.value,
       status: 'completed' as const
     };
-
     const updatedHistory: any = user.history ? [...user.history, order] : [order];
-    
     if (user.id === "Guest") {
-      // Для гостя обновляем локально
       global.updateUserField("history", updatedHistory);
       global.updateUserField("basket", []);
     } else {
-      // Для авторизованного пользователя обновляем в БД
       await updateUserField("history", updatedHistory);
       await updateUserField("basket", []);
     }
-    
     console.log('✅ Заказ успешно перемещен в историю');
   } catch (err: any) {
     console.error('❌ Ошибка при оформлении заказа:', err);
@@ -138,18 +113,12 @@ async function moveBasketToHistory() {
 }
 
 // монтирование и отслеживание изменений
-onMounted(() => {
-  loadSneakers();
-});
+onMounted(() => { loadSneakers() });
 
 // следим за изменением корзины
-watch(
-  () => global.user?.basket,
-  () => {
-    if (global.user) loadSneakers();
-  },
-  { deep: true }
-);
+watch(() => global.user?.basket, () => {
+  if (global.user) loadSneakers();
+}, { deep: true });
 </script>
 
 <template>
@@ -167,19 +136,11 @@ watch(
         </div>
       </div>
       <div class="right" v-if="!loading && basketItems.length > 0">
-        <div
-          class="vfv"
-          v-for="value in basketItems"
-          :key="`${value.id}-${value.favouriteColor}-${value.favouriteSize}`"
-        >
+        <div class="vfv" v-for="value in basketItems" :key="`${value.id}-${value.favouriteColor}-${value.favouriteSize}`">
           <div class="name">{{ value.name }}</div>
           <div class="cost">{{ value.cost }} {{ getTranslatedRub() }}</div>
         </div>
-        <button 
-          class="finalcost" 
-          @click="moveBasketToHistory()" 
-          :disabled="!global.user || global.user.id === 'Guest'"
-        >
+        <button class="finalcost" @click="moveBasketToHistory()" :disabled="!global.user || global.user.id === 'Guest'">
           {{ getTranslatedText('makePurchase') }} {{ totalCost }} {{ getTranslatedRub() }}
         </button>
       </div>
@@ -193,8 +154,7 @@ main {
   display: flex;
   overflow: hidden;
 
-  .normal,
-  .center {
+  .normal, .center {
     overflow: scroll;
     height: 100%;
   }
@@ -265,7 +225,9 @@ main {
       width: 100%;
       height: 14rem;
       overflow: scroll;
-    }::-webkit-scrollbar {
+    }
+    
+    ::-webkit-scrollbar {
       display: none;
     }
 

@@ -24,20 +24,15 @@ function toggleMode() { mode.value = mode.value === "login" ? "register" : "logi
 
 // регистрация
 async function handleSubmit(e: Event) {
-  // проверка формата данных
   e.preventDefault();
   if (data.password.length < 6 && mode.value === "register") {
     errData.value.pass = true;
-    setTimeout(() => {
-      errData.value.pass = false;
-    }, 3000);
+    setTimeout(() => { errData.value.pass = false }, 3000);
     return
   }
   if (data.name.length < 3 && mode.value === "register") {
     errData.value.name = true;
-    setTimeout(() => {
-      errData.value.name = false;
-    }, 3000);
+    setTimeout(() => { errData.value.name = false }, 3000);
     return
   }
   // сама регистрация
@@ -64,9 +59,7 @@ async function handleSubmit(e: Event) {
   } catch (err: any) {
     if (err = "User already registered") {
       errData.value.reuse = true;
-      setTimeout(() => {
-        errData.value.reuse = false;
-      }, 3000);
+      setTimeout(() => { errData.value.reuse = false }, 3000);
     }
   }
 }

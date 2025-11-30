@@ -2,13 +2,16 @@
 // vue
 import { inject, computed } from "vue";
 
-// components
+// components & types
 import sidebar_item from "../sidebar_item.vue";
+import type { provide_everything } from '../../../../helper/types';
 
 // filterState получается через inject
-const filterState = inject("filterState") as any;
+const filterState = inject("filterState") as provide_everything;
 
-// массив вариантов сортировки с ключами для локализации
+// vars
+const activeSort = computed(() => filterState.state.sortBy);
+const sortOrder = computed(() => filterState.state.sortOrder);
 const data_array = [
   { name: "releaseDate", val: "id" },
   { name: "name", val: "name" },
@@ -17,10 +20,6 @@ const data_array = [
   { name: "gender", val: "gender" },
   { name: "price", val: "cost" },
 ];
-
-// vars
-const activeSort = computed(() => filterState.state.sortBy);
-const sortOrder = computed(() => filterState.state.sortOrder);
 
 // Функция для получения переведенного названия
 function getTranslatedName(key: string) {
@@ -46,17 +45,7 @@ function handleSortClick(optionVal: string) {
 <template>
   <div class="filter-holder">
     <div class="size">{{ getTranslatedName('sortBy') }}</div>
-    <sidebar_item 
-      v-for="option in data_array" 
-      :key="option.val" 
-      :name="getTranslatedName(option.name)" 
-      :val="option.val" 
-      :display_color="false" 
-      :color="'#000'" 
-      :direction="getSortDirection(option.val)" 
-      :active="activeSort === option.val" 
-      @was-clicked="handleSortClick" 
-    />
+    <sidebar_item v-for="option in data_array" :key="option.val" :name="getTranslatedName(option.name)" :val="option.val" :display_color="false" :color="'#000'" :direction="getSortDirection(option.val)" :active="activeSort === option.val" @was-clicked="handleSortClick" />
   </div>
 </template>
 

@@ -15,11 +15,7 @@ const global = useGlobalState();
       <router-link to="/settings"></router-link>
     </div>
     <router-link class="icon-wrapper" to="/profile">
-      <img
-        v-if="global.user && global.user.id !== 'Guest'"
-        :src="`/profile/${global.user.icon}.jpg`"
-        alt="user-icon"
-      />
+      <img v-if="global.user && global.user.id !== 'Guest'" :src="`/profile/${global.user.icon}.jpg`" alt="user-icon" />
       <img v-else :src="`/profile/0.jpg`" alt="user-icon" />
     </router-link>
   </header>
@@ -59,32 +55,18 @@ const global = useGlobalState();
       display: flex;
       align-items: center;
       cursor: pointer;
-      
-      &[href="/home"]::after {
-        content: var(--home);
-      }
-      &[href="/catalog"]::after {
-        content: var(--catalog);
-      }
-      &[href="/favourite"]::after {
-        content: var(--favourites);
-      }
-      &[href="/basket"]::after {
-        content: var(--basket);
-      }
-      &[href="/settings"]::after {
-        content: var(--settings);
-      }
-      
+      &[href="/home"]::after { content: var(--home) }
+      &[href="/catalog"]::after { content: var(--catalog) }
+      &[href="/favourite"]::after { content: var(--favourites) }
+      &[href="/basket"]::after { content: var(--basket) }
+      &[href="/settings"]::after { content: var(--settings) }
       &::after {
         color: var(--text-a);
         white-space: nowrap;
       }
     }
 
-    *:hover,
-    *:active,
-    *:focus {
+    *:hover, *:active, *:focus {
       background: var(--bg-c);
     }
   }
@@ -208,7 +190,7 @@ const global = useGlobalState();
   }
 }
 
-/* Для случаев когда навигация не помещается */
+/* Дополнительно */
 @media (max-width: 320px) {
   .header-home {
     .header-nav a {

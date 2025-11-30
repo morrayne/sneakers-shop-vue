@@ -7,24 +7,12 @@ import { useGlobalState } from "../../helper/pinia";
 import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
-// types
-interface Color {
-  name: string;
-  folder_name: string;
-}
-interface BasketItem {
-  id: number;
-  name: string;
-  favouriteColor: number;
-  favouriteSize: string;
-  colors: Color[];
-  gender: string;
-  rating: number;
-  cost: number;
-}
+// types & vars
+const loading = ref(false);
+import type { basket_item } from "../../helper/types";
 
 // props & emits
-const props = defineProps<{ data: BasketItem }>();
+const props = defineProps<{ data: basket_item }>();
 const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
 
 // Функция для получения переведенной валюты
@@ -33,9 +21,6 @@ function getTranslatedRub() {
   return value ? value.replace(/^"(.*)"$/, '$1') : 'rub';
 }
 
-// vars
-const loading = ref(false);
-
 // функция удаления из корзины
 async function removeFromBasket() {
   if (loading.value) return;
@@ -43,21 +28,13 @@ async function removeFromBasket() {
   try {
     const { id, favouriteColor, favouriteSize, colors } = props.data;
     const colorName = colors[favouriteColor]?.name ?? "";
-    
     if (!global.user) throw new Error("Пользователь не инициализирован");
-    
     const updatedBasket = global.user.basket.filter((item) => {
       const sameId = item.id === id;
       const sameSize = item.size === favouriteSize;
-      
-      // Простое сравнение цвета - если color это число, сравниваем числа, если строка - сравниваем строки
-      const sameColor = typeof item.color === "number" 
-        ? item.color === favouriteColor
-        : item.color === colorName;
-      
+      const sameColor = typeof item.color === "number" ? item.color === favouriteColor : item.color === colorName;
       return !(sameId && sameSize && sameColor);
     });
-    
     await updateUserField("basket", updatedBasket);
     emit("item-removed", id, favouriteColor, favouriteSize);
   } catch (err: any) {

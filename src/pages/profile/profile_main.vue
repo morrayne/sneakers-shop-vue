@@ -18,13 +18,7 @@ import history_main from "./auth/history_main.vue";
       <div class="left" v-if="global.user && global.user.id !== 'Guest'">
         <left_main :user="global.user" />
       </div>
-      <div
-        :class="
-          global.user && global.user.id !== 'Guest'
-            ? 'chopped-right'
-            : 'full-right'
-        "
-      >
+      <div :class="global.user && global.user.id !== 'Guest' ? 'chopped-right' : 'full-right'">
         <registration_form v-if="global.user && global.user.id === 'Guest'" />
         <history_main v-else />
       </div>

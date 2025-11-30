@@ -398,16 +398,13 @@ html {
   overflow: hidden;
 }
 
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html,
-body {
+html, body {
   height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
@@ -419,11 +416,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img,
-picture,
-video,
-canvas,
-svg {
+img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
 }
@@ -441,8 +434,7 @@ a {
   color: inherit;
 }
 
-ul,
-ol {
+ul, ol {
   list-style: none;
 }
 
@@ -486,9 +478,9 @@ svg {
   --text-a: #fffffe;
   --text-b: #cecece;
   --text-c: #8d8d8d;
-  --main-accent: #1c274c;
-  --sub-accent: #29396d;
-  --extra-accent: #000000;
+  --accent-a: #1c274c;
+  --accent-b: #29396d;
+  --accent-c: #000000;
   --transparent: #00000000;
   --svg-invert: 1;
 }
@@ -501,9 +493,9 @@ svg {
   --text-a: #131414;
   --text-b: #242424;
   --text-c: #424242;
-  --main-accent: #260c79;
-  --sub-accent: #524594;
-  --extra-accent: #000000;
+  --accent-a: #c1b4ee;
+  --accent-b: #796cb8;
+  --accent-c: #000000;
   --transparent: #00000000;
   --svg-invert: 0;
 }

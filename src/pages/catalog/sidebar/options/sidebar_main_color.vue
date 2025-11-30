@@ -2,34 +2,23 @@
 // vue
 import { inject, computed } from "vue";
 
-// components
+// components & types
 import sidebar_item from "../sidebar_item.vue";
+import type { provide_everything } from '../../../../helper/types';
 
 // filterState получается через inject
-const filterState = inject("filterState") as any;
+const filterState = inject("filterState") as provide_everything;
 if (!filterState) { throw new Error("filterState is undefined! Проверьте provide в родителе.") }
 
-// props
+// props & vars
 const props = defineProps<{ data_array: string[] }>();
-
-// активный цвет
 const activeColor = computed(() => filterState.state.filters.color);
 </script>
 
 <template>
   <div class="filter-holder">
     <div class="size i18n" data-key="colors"></div>
-    <sidebar_item 
-      v-for="item in props.data_array" 
-      :key="item" 
-      :name="item" 
-      :val="item" 
-      :display_color="true" 
-      :color="item"
-      :direction="false"
-      :active="activeColor === item"
-      @was-clicked="() => filterState.methods.setFilter('color', item)"
-    />
+    <sidebar_item v-for="item in props.data_array" :key="item" :name="item" :val="item" :display_color="true" :color="item" :direction="false" :active="activeColor === item" @was-clicked="() => filterState.methods.setFilter('color', item)" />
   </div>
 </template>
 

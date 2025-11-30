@@ -2,68 +2,36 @@
 import { computed } from "vue";
 
 // types
-interface SneakerColor {
-  name: string;
-  folder_name: string;
-}
-
-interface Sneaker {
-  id: number;
-  name: string;
-  cost: number;
-  colors: SneakerColor[];
-}
-
-interface OrderItem {
-  id: number;
-  color: string;
-  size: string;
-}
-
-interface Order {
-  id: number;
-  date: string;
-  items: OrderItem[];
-  total?: number;
-  status?: string;
-}
+import type { color_item, history_item, product_item, order_item } from "../../../helper/types";
 
 // props
 const props = defineProps<{
-  order: Order;
-  sneakers: Sneaker[];
+  order: order_item;
+  sneakers: history_item[];
 }>();
 
 // Функция для получения переведенного текста
 function getTranslatedText(key: string): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(
-    `--${key}`
-  );
+  const value = getComputedStyle(document.documentElement).getPropertyValue(`--${key}`);
   return value ? value.replace(/^"(.*)"$/, "$1") : key;
 }
 
 // Функция для получения переведенной валюты
 function getTranslatedRub(): string {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(
-    "--rub"
-  );
+  const value = getComputedStyle(document.documentElement).getPropertyValue("--rub");
   return value ? value.replace(/^"(.*)"$/, "$1") : "rub";
 }
 
 // Находим информацию о товарах в заказе
 const orderItems = computed(() => {
-  return props.order.items.map((item: OrderItem) => {
-    const sneaker = props.sneakers.find((s: Sneaker) => s.id === item.id);
+  return props.order.items.map((item: product_item) => {
+    const sneaker = props.sneakers.find((s: history_item) => s.id === item.id);
     return { ...item, sneaker: sneaker || null };
   });
 });
 
 // Общая стоимость заказа
-const totalCost = computed((): number => {
-  return orderItems.value.reduce((sum: number, item: any) => {
-    return sum + (item.sneaker?.cost || 0);
-  }, 0);
-});
+const totalCost = computed((): number => { return orderItems.value.reduce((sum: number, item: any) => { return sum + (item.sneaker?.cost || 0) }, 0) });
 </script>
 
 <template>
@@ -71,26 +39,12 @@ const totalCost = computed((): number => {
     <div class="order-header">
       <p>{{ getTranslatedText("order") }} #{{ order.id }}</p>
       <p>{{ new Date(order.date).toLocaleDateString() }}</p>
-      <p>
-        {{ getTranslatedText("totalCost") }}: {{ totalCost }}
-        {{ getTranslatedRub() }}
-      </p>
+      <p>{{ getTranslatedText("totalCost") }}: {{ totalCost }} {{ getTranslatedRub() }}</p>
     </div>
     <div class="order-items">
-      <div
-        v-for="item in orderItems"
-        :key="`${item.id}-${item.color}-${item.size}`"
-        class="order-item"
-      >
+      <div v-for="item in orderItems" :key="`${item.id}-${item.color}-${item.size}`" class="order-item">
         <div class="item-image">
-          <img
-            v-if="item.sneaker"
-            :src="`/sneakers/${item.sneaker.id}-${
-              item.sneaker.colors.find((c: SneakerColor) => c.name === item.color)
-                ?.folder_name || item.sneaker.colors[0]?.folder_name
-            }/0.jpg`"
-            :alt="item.sneaker.name"
-          />
+          <img v-if="item.sneaker" :src="`/sneakers/${item.sneaker.id}-${item.sneaker.colors.find((c: color_item) => c.name === item.color) ?.folder_name || item.sneaker.colors[0]?.folder_name}/0.jpg`" :alt="item.sneaker.name" />
           <img v-else src="/public/gif/evernight.gif" alt="No image" />
         </div>
         <div class="item-details">
@@ -128,7 +82,9 @@ const totalCost = computed((): number => {
       color: var(--text-a);
       background: var(--bg-c);
     }
-  }::-webkit-scrollbar {
+  }
+  
+  ::-webkit-scrollbar {
     display: none;
   }
 
@@ -167,13 +123,11 @@ const totalCost = computed((): number => {
           text-overflow: ellipsis;
         }
 
-        .name,
-        .price {
+        .name, .price {
           width: 100%;
         }
 
-        .color,
-        .size {
+        .color, .size {
           width: fit-content;
           padding: 0.2rem 0.5rem;
           border-radius: 0.35rem;

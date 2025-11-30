@@ -4,9 +4,7 @@ import { useGlobalState } from "./pinia";
 import type { user_type, product_item } from "./types";
 
 // 🔧 Проверка гостя
-function isGuest(user: user_type | null): boolean {
-  return !user || user.id === "Guest";
-}
+function isGuest(user: user_type | null): boolean { return !user || user.id === "Guest" }
 
 // 🔐 ИНИЦИАЛИЗАЦИЯ (гость или восстановление сессии)
 export async function initAuth() {
@@ -32,10 +30,7 @@ export async function initAuth() {
 // 🔐 РЕГИСТРАЦИЯ
 export async function registerUser(form: Pick<user_type, "email" | "password" | "name" | "icon">) {
   const global = useGlobalState();
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: form.email,
-    password: form.password,
-  });
+  const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: form.password });
   if (authError) throw authError;
   if (!authData.user) throw new Error("Ошибка регистрации: пользователь не создан");
   const { error: insertError } = await supabase.from("profiles").insert([{
@@ -44,7 +39,7 @@ export async function registerUser(form: Pick<user_type, "email" | "password" | 
     icon: form.icon,
     favourite: [],
     basket: [],
-    history: [],
+    history: []
   }]);
   if (insertError) throw insertError;
   await syncPiniaAndSupabase(authData.user.id);
@@ -54,10 +49,7 @@ export async function registerUser(form: Pick<user_type, "email" | "password" | 
 
 // 🔐 ВХОД
 export async function loginUser(email: string, password: string) {
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
   if (authError) throw authError;
   if (!authData.user) throw new Error("Ошибка авторизации: пользователь не найден");
   await syncPiniaAndSupabase(authData.user.id);

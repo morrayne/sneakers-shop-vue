@@ -2,8 +2,9 @@
 // vue
 import { ref, onMounted, inject, computed } from 'vue';
 
-// supabase
+// supabase & types
 import { supabase } from '../../../helper/imp/supabase';
+import type { provide_everything } from '../../../helper/types';
 
 // imports
 import list_filler from '../fillers/list_filler.vue';
@@ -12,9 +13,7 @@ import list_card_main from './list_card_main.vue';
 // vars
 const sneakers = ref<any[]>([]);
 const loading = ref<boolean>(true);
-
-// inject состояния фильтров и поиска
-const filterState = inject('filterState') as any;
+const filterState = inject('filterState') as provide_everything;
 if (!filterState) throw new Error("filterState is undefined! Проверьте provide в родителе.");
 
 // загрузка данных
@@ -33,9 +32,7 @@ async function fetchSneakers() {
 }
 
 // при монтировании компонента запрос кроссовков
-onMounted(() => {
-  fetchSneakers();
-});
+onMounted(() => { fetchSneakers() });
 
 // вычисляемый массив с фильтрацией & поиском & сортировкой
 const displayedSneakers = computed(() => {
@@ -51,17 +48,13 @@ const displayedSneakers = computed(() => {
     const s = filterState.state.search.toLowerCase();
     result = result.filter(item => item.name.toLowerCase().includes(s) || item.brand.toLowerCase().includes(s));
   }
-  // учет направления при сортировке
   const sortKey = filterState.state.sortBy;
   const sortOrder = filterState.state.sortOrder;
   result.sort((a, b) => {
     let valA = a[sortKey];
     let valB = b[sortKey];
-    // числовые значения
     if (typeof valA === 'number' && typeof valB === 'number') { return sortOrder === 'asc' ? valA - valB : valB - valA }
-    // строковые значений
     if (typeof valA === 'string' && typeof valB === 'string') { return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA) }
-    // обработка undefined или null
     if (valA == null && valB != null) return sortOrder === 'asc' ? -1 : 1;
     if (valA != null && valB == null) return sortOrder === 'asc' ? 1 : -1;
     return 0;

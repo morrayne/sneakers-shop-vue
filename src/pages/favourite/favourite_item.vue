@@ -1,6 +1,6 @@
 <script setup lang="ts">
+// vue
 import { ref, computed } from "vue";
-import type { product_item, sneaker_item, sneaker_color } from "../../helper/types";
 
 // props & emits
 const props = defineProps<{ 
@@ -17,7 +17,8 @@ import { useGlobalState } from "../../helper/pinia";
 import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
-// vars
+// types & vars
+import type { product_item, sneaker_item, sneaker_color } from "../../helper/types";
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 const selectedSize = ref(props.data.size || sizes[0]);
 const loading = ref(false);
@@ -54,11 +55,7 @@ async function moveToBasket(): Promise<void> {
   if (loading.value || !global.user) return;
   loading.value = true;
   try {
-    const basketItem: product_item = {
-      id: props.data.id,
-      color: props.data.color,
-      size: selectedSize.value!
-    };
+    const basketItem: product_item = { id: props.data.id, color: props.data.color, size: selectedSize.value! };
     const currentBasket: product_item[] = global.user.basket || [];
     const existsInBasket: boolean = currentBasket.some((item: product_item) => 
       item.id === basketItem.id && 

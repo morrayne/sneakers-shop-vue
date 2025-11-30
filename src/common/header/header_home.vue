@@ -60,27 +60,19 @@ const global = useGlobalState();
       display: flex;
       align-items: center;
       cursor: pointer;
-      
-      // Убираем стандартный текст
       color: transparent;
-      
-      // Добавляем контент через CSS переменные
-      &[href="/home"]::after { content: var(--home); }
-      &[href="/catalog"]::after { content: var(--catalog); }
-      &[href="/favourite"]::after { content: var(--favourites); }
-      &[href="/basket"]::after { content: var(--basket); }
-      &[href="/settings"]::after { content: var(--settings); }
-      
-      // Возвращаем цвет для псевдоэлементов
+      &[href="/home"]::after { content: var(--home) }
+      &[href="/catalog"]::after { content: var(--catalog) }
+      &[href="/favourite"]::after { content: var(--favourites) }
+      &[href="/basket"]::after { content: var(--basket) }
+      &[href="/settings"]::after { content: var(--settings) }
       &::after {
         color: var(--main-header-text);
         white-space: nowrap;
       }
-    }
+    } 
 
-    *:hover,
-    *:active,
-    *:focus {
+    *:hover, *:active, *:focus {
       background: var(--sub-header-bg);
     }
   }
@@ -200,7 +192,7 @@ const global = useGlobalState();
   }
 }
 
-/* Для случаев когда навигация не помещается */
+/* Дополнительно */
 @media (max-width: 320px) {
   .header-home {
     .header-nav * {

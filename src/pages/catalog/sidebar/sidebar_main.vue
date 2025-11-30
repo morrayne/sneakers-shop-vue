@@ -2,15 +2,12 @@
 // vue
 import { inject } from "vue";
 
-// filterState получается через inject
-const filterState = inject("filterState") as any;
+// props & types
+const props = defineProps<arrays_sidebar_main>();
+import type { arrays_sidebar_main, provide_everything } from "../../../helper/types";
 
-// props
-const props = defineProps<{
-  color_array: any;
-  brand_array: any;
-  gender_array: any;
-}>();
+// filterState получается через inject
+const filterState = inject("filterState") as provide_everything;
 
 // components
 import sidebar_main_filter from "./options/sidebar_main_sort.vue";
@@ -41,9 +38,12 @@ function handleinput(event: Event) {
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   opacity: 1;
-}:focus {
+}
+
+:focus {
     outline: solid 1px var(--text-a);
 }
+
 ::placeholder {
   color: var(--text-c);
 }

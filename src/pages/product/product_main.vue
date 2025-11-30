@@ -104,29 +104,29 @@ onMounted(async () => {
     <main v-else>
       <div class="left">
         <div class="tags">
-          <div class="tag">{{ product?.brand }}</div>
-          <div class="tag">{{ product?.gender }}</div>
-          <div class="tag">{{ product?.id }}</div>
+          <div class="tag">{{ product.brand }}</div>
+          <div class="tag">{{ product.gender }}</div>
+          <div class="tag">{{ product.id }}</div>
         </div>
         <div class="main-img">
-          <img :src="`/sneakers/${product?.id}-${product?.colors?.[selected.color]?.folder_name}/${selected.main_photo}.jpg`" alt="" />
+          <img :src="`/sneakers/${product.id}-${product.colors?.[selected.color].folder_name}/${selected.main_photo}.jpg`" alt="" />
         </div>
         <div class="img-wrapper">
           <div class="img-holder" v-for="value in 3" :key="value" @click="selected.main_photo = value - 1">
-            <img :src="`/sneakers/${product?.id}-${product?.colors?.[selected.color]?.folder_name}/${value - 1}.jpg`" alt="" />
+            <img :src="`/sneakers/${product.id}-${product.colors?.[selected.color].folder_name}/${value - 1}.jpg`" alt="" />
           </div>
           <div class="filler" v-if="false">{{ getTranslatedText('seeMore') }}</div>
         </div>
       </div>
       <div class="right">
-        <div class="model-name">{{ product?.name }}</div>
+        <div class="model-name">{{ product.name }}</div>
         <div class="model-rating">
-          {{ product?.rating }} / 100 {{ getTranslatedText('on') }} {{ (product?.rating % 3).toFixed(0) }} {{ getTranslatedText('reviews') }}
+          {{ product.rating }} / 100 {{ getTranslatedText('on') }} {{ (product.rating % 3).toFixed(0) }} {{ getTranslatedText('reviews') }}
         </div>
-        <div class="model-cost">{{ product?.cost }}.00 {{ getTranslatedText('rub') }}</div>
+        <div class="model-cost">{{ product.cost }}.00 {{ getTranslatedText('rub') }}</div>
         <div class="model-colors">
-          <div class="img-wrapper" v-for="(color, index) in product?.colors" :key="index" @click="selected.color = index">
-            <img :src="`/sneakers/${product?.id}-${color.folder_name}/0.jpg`" />
+          <div class="img-wrapper" v-for="(color, index) in product.colors" :key="index" @click="selected.color = index">
+            <img :src="`/sneakers/${product.id}-${color.folder_name}/0.jpg`" />
           </div>
         </div>
         <div class="model-sizes">
