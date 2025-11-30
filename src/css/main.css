@@ -547,7 +547,7 @@ svg {
   --register: "Зарегестрироваться";
   --passErr: "Пароль должен быть минимум из 6 символов";
   --nameErr: "Пароль должно быть минимум из 3 символов";
-  --reuseErr: "Такая почта уже занята";
+  --reuseErr: "Такая почта уже занята или неверный пароль";
 }
 
 :root[lang=en] {
@@ -597,5 +597,5 @@ svg {
   --register: "Register";
   --passErr: "Password should contain at least 6 digits";
   --nameErr: "Name should contain at least 3 digits";
-  --reuseErr: "Email already taken";
+  --reuseErr: "Email already taken or wrong password";
 }/*# sourceMappingURL=main.css.map */
