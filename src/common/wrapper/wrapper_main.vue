@@ -3,10 +3,15 @@
     <div class="background">
       <div class="content">
         <slot></slot>
+        <notification_main />
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import notification_main from '../notification/notification_main.vue';
+</script>
 
 <style scoped lang="scss">
 .wrapper {

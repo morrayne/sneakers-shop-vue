@@ -561,6 +561,7 @@ svg {
   --passErr: "Пароль должен быть минимум из 6 символов";
   --nameErr: "Пароль должно быть минимум из 3 символов";
   --reuseErr: "Такая почта уже занята или неверный пароль";
+  --noFilters: "По фильтрам ничего не найдено";
 }
 
 :root[lang=en] {
@@ -611,4 +612,5 @@ svg {
   --passErr: "Password should contain at least 6 digits";
   --nameErr: "Name should contain at least 3 digits";
   --reuseErr: "Email already taken or wrong password";
+  --noFilters: "Nothing found via filters";
 }/*# sourceMappingURL=main.css.map */

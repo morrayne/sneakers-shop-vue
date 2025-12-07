@@ -15,7 +15,7 @@ import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
 // types & vars
-const totalCost = computed(() => { return basketItems.value.reduce((sum, item) => sum + (item.cost || 0), 0) });
+const totalCost = computed(() => { return basketItems.value.reduce((sum, item) => sum + ((item.cost || 0) * (item.quantity ?? 1)), 0) });
 import type { sneaker_color, product_item } from "../../helper/types";
 
 // state
@@ -63,7 +63,7 @@ const basketItems = computed(() => {
     if (!sneaker) return null;
     const colors = sneaker.colors as sneaker_color[];
     const colorIndex = typeof basketItem.color === "number" ? basketItem.color : colors.findIndex((c) => c.name === basketItem.color);
-    return { ...sneaker, favouriteColor: colorIndex >= 0 ? colorIndex : 0, favouriteSize: basketItem.size };
+    return { ...sneaker, favouriteColor: colorIndex >= 0 ? colorIndex : 0, favouriteSize: basketItem.size, quantity: basketItem.quantity ?? 1 };
   }).filter(Boolean);
 });
 
@@ -137,8 +137,8 @@ watch(() => global.user?.basket, () => {
       </div>
       <div class="right" v-if="!loading && basketItems.length > 0">
         <div class="vfv" v-for="value in basketItems" :key="`${value.id}-${value.favouriteColor}-${value.favouriteSize}`">
-          <div class="name">{{ value.name }}</div>
-          <div class="cost">{{ value.cost }} {{ getTranslatedRub() }}</div>
+          <div class="name">{{ value.name }} x{{ value.quantity ?? 1 }}</div>
+          <div class="cost">{{ (value.cost * (value.quantity ?? 1)) }} {{ getTranslatedRub() }}</div>
         </div>
         <button class="finalcost" @click="moveBasketToHistory()" :disabled="!global.user || global.user.id === 'Guest'">
           {{ getTranslatedText('makePurchase') }} {{ totalCost }} {{ getTranslatedRub() }}

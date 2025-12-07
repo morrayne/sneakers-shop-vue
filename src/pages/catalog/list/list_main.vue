@@ -64,6 +64,41 @@ const displayedSneakers = computed(() => {
 </script>
 
 <template>
-  <list_filler v-if="loading" v-for="value in 20" :key="value" />
-  <list_card_main v-else v-for="item in displayedSneakers" :key="item.id" :data="item" class="card" />
+  <list_filler v-if="loading && displayedSneakers.length !== 0" v-for="value in 20" :key="value" />
+  <list_card_main v-else-if="!loading && displayedSneakers.length !== 0" v-for="item in displayedSneakers" :key="item.id" :data="item" class="card" />
+  <div class="ever" v-else>
+    <img src="/public/gif/evernight.gif" alt="Анимация" />
+    <p></p>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.ever {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-width: 20rem;
+  }
+
+  p {
+    &::before {
+      content: var(--noFilters, "Ничего не найдено");
+    }
+  }
+}
+
+.ever {
+  p {
+    content: var(--noFilters, "Ничего не найдено");
+  }
+}
+</style>

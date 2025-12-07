@@ -4,7 +4,7 @@ import { ref } from "vue";
 
 // pinia 
 import { useGlobalState } from "../../helper/pinia";
-import { updateUserField } from "../../helper/actions";
+import { updateUserField, setBasketQuantity } from "../../helper/actions";
 const global = useGlobalState();
 
 // types & vars
@@ -44,6 +44,26 @@ async function removeFromBasket() {
     loading.value = false;
   }
 }
+
+// изменение количества
+const quantityRef = ref(props.data.quantity ?? 1);
+
+async function changeQuantity(delta: number, event?: Event) {
+  if (event) event.stopPropagation();
+  const newQty = Math.max(0, (quantityRef.value || 1) + delta);
+  const old = quantityRef.value;
+  quantityRef.value = newQty;
+  try {
+    const colorName = props.data.colors[props.data.favouriteColor]?.name ?? "";
+    await setBasketQuantity({ id: props.data.id, color: colorName, size: props.data.favouriteSize, quantity: newQty }, newQty);
+    if (newQty <= 0) {
+      emit("item-removed", props.data.id, props.data.favouriteColor, props.data.favouriteSize);
+    }
+  } catch (err: any) {
+    console.error("Ошибка обновления количества:", err.message ?? err);
+    quantityRef.value = old;
+  }
+}
 </script>
 
 <template>
@@ -62,8 +82,15 @@ async function removeFromBasket() {
         <div class="stag">{{ props.data.favouriteSize }}</div>
         <div class="stag">{{ props.data.rating }} / 100</div>
       </div>
-      <div class="movetobasket">{{ props.data.cost }} {{ getTranslatedRub() }}</div>
-    </div>
+      <div class="duo">
+        <div class="movetobasket">{{ (props.data.cost * (quantityRef || props.data.quantity || 1)) }} {{ getTranslatedRub() }}</div>
+          <div class="qty-actions">
+            <button class="qty-btn" @click="changeQuantity(-1, $event)">-</button>
+            <div class="qty-val">{{ quantityRef }}</div>
+            <button class="qty-btn" @click="changeQuantity(1, $event)">+</button>
+          </div>      
+        </div>
+      </div>
   </div>
 </template>
 
@@ -141,6 +168,11 @@ async function removeFromBasket() {
     margin: 0.5rem 0;
   }
 
+  .duo {
+    display: flex;
+    gap: 1rem;
+  }
+
   .movetobasket {
     width: 100%;
     border-radius: 0.5rem;
@@ -149,6 +181,30 @@ async function removeFromBasket() {
     background: var(--text-a);
     color: var(--bg-a);
     cursor: pointer;
+  }
+
+  .qty-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .qty-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.35rem;
+    border: none;
+    background: var(--bg-d);
+    color: var(--text-a);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .qty-val {
+    min-width: 2rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-a);
   }
 }
 

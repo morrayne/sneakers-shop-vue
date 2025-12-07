@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // vue
-import { ref, reactive, onMounted, provide } from "vue";
+import { ref, reactive, onMounted, provide, watch } from "vue";
+import { useRoute } from 'vue-router';
+const route = useRoute();
 
 // components
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
@@ -80,6 +82,21 @@ function setSortBy(sortBy: string) {
 }
 function setSortOrder(order: "asc" | "desc") { everything.sortOrder = order }
 function setFilter(type: "color" | "gender" | "brand", value: string) { everything.filters[type] = value }
+
+// При заходе на страницу читаем query и применяем переданные фильтры
+onMounted(() => {
+  const q = route.query;
+  if (q.brand) setFilter('brand', String(q.brand));
+  if (q.gender) setFilter('gender', String(q.gender));
+  if (q.color) setFilter('color', String(q.color));
+});
+
+// Если query меняется — синхронизируем фильтры
+watch(() => route.query, (newQ) => {
+  if (newQ.brand) setFilter('brand', String(newQ.brand));
+  if (newQ.gender) setFilter('gender', String(newQ.gender));
+  if (newQ.color) setFilter('color', String(newQ.color));
+});
 </script>
 
 <template>
@@ -123,6 +140,7 @@ main {
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
     overflow-y: scroll;
+    position: relative;
   }
   ::-webkit-scrollbar {
     display: none;

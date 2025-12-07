@@ -97,6 +97,7 @@ async function handleSubmit(e: Event) {
   gap: 1rem;
 
   .alert {
+    width: fit-content;
     border-top: solid 2px red;
     padding: 0.5rem 2rem;
     background: var(--text-a);

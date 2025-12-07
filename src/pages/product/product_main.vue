@@ -8,9 +8,10 @@ const global = useGlobalState();
 import { supabase } from "../../helper/imp/supabase";
 
 // router & actions
-import { updateUserField } from "../../helper/actions";
-import { useRoute } from "vue-router";
+import { addToBasket as addToBasketAction, addToFavourites as addToFavouritesAction } from "../../helper/actions";
+import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
+const router = useRouter();
 
 // components
 import header_main from "../../common/header/header_main.vue";
@@ -21,7 +22,8 @@ import product_filler from "./product_filler.vue";
 const loading = ref(true);
 const productId = ref<string>("");
 const product = ref<any>(null);
-const selected = reactive({ main_photo: 0, color: 0, size: "40.0" });
+const selected = reactive({ main_photo: 0, color: 0, size: "40.0" as string });
+const quantity = ref<number>(1);
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
 
 // Функция для получения переведенного текста
@@ -52,20 +54,23 @@ watch(() => route.params.id, (newId) => {
   fetchProduct();
 });
 
+// переход на каталог с применением фильтрации (нажатие по id — игнорируется)
+function openCatalogFilter(type: 'brand' | 'gender' | 'color' | 'id', value: string | number) {
+  if (type === 'id') return; // ничего не делаем при клике по id
+  const query: any = {};
+  // передаём только соответствующий фильтр в query
+  query[type] = String(value);
+  router.push({ path: '/catalog', query });
+}
+
 // добавление в избранное
 async function addToFavourite() {
   try {
     const product_id = product.value.id;
     const colorName = product.value.colors[selected.color].name;
     if (!global.user) return;
-    const currentFavourite = global.user.favourite || [];
-    const exists = currentFavourite.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
-    const updatedFavourite = exists ? currentFavourite.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)) : [...currentFavourite, { id: product_id, color: colorName, size: selected.size }];
-    if (global.user.id === "Guest") {
-      global.user.favourite = updatedFavourite;
-    } else {
-      await updateUserField("favourite", updatedFavourite);
-    }
+    // Используем единый экшен для избранного
+    await addToFavouritesAction({ id: product_id, color: colorName, size: selected.size });
   } catch (err) {
     console.error("❌ Ошибка при обновлении избранного:", err);
   }
@@ -77,14 +82,8 @@ async function addToBasket() {
     const product_id = product.value.id;
     const colorName = product.value.colors[selected.color].name;
     if (!global.user) return;
-    const currentBasket = global.user.basket || [];
-    const exists = currentBasket.some((item: any) => item.id === product_id && item.color === colorName && item.size === selected.size);
-    const updatedBasket = exists ? currentBasket.filter((item: any) => !(item.id === product_id && item.color === colorName && item.size === selected.size)): [...currentBasket, { id: product_id, color: colorName, size: selected.size }];
-    if (global.user.id === "Guest") {
-      global.user.basket = updatedBasket;
-    } else {
-      await updateUserField("basket", updatedBasket);
-    } 
+    // Используем общий экшен для корзины — он объединяет по id/color/size и учитывает quantity
+    await addToBasketAction({ id: product_id, color: colorName, size: selected.size, quantity: quantity.value });
   } catch (err) {
     console.error("❌ Ошибка при обновлении корзины:", err);
   }
@@ -104,8 +103,8 @@ onMounted(async () => {
     <main v-else>
       <div class="left">
         <div class="tags">
-          <div class="tag">{{ product.brand }}</div>
-          <div class="tag">{{ product.gender }}</div>
+          <div class="tag" @click.stop="openCatalogFilter('brand', product.brand)">{{ product.brand }}</div>
+          <div class="tag" @click.stop="openCatalogFilter('gender', product.gender)">{{ product.gender }}</div>
           <div class="tag">{{ product.id }}</div>
         </div>
         <div class="main-img">
@@ -137,11 +136,17 @@ onMounted(async () => {
             {{ value }}
           </div>
         </div>
+       
         <div class="duo-button">
           <button class="cart" @click="addToBasket()">
             <img src="/svg/bag.svg" alt="" />
             <span>{{ getTranslatedText('addToCart') }}</span>
           </button>
+          <div class="model-quantity">
+            <button class="qty" @click="quantity = Math.max(1, quantity - 1)">-</button>
+            <div class="qty-val">{{ quantity }}</div>
+            <button class="qty" @click="quantity = Math.min(99, quantity + 1)">+</button>
+          </div>
           <button class="favourite" @click="addToFavourite()">
             <img src="/svg/heart.svg" alt="" />
           </button>
@@ -155,5 +160,41 @@ onMounted(async () => {
 main {
   justify-content: center;
   gap: 4rem;
+}
+
+.model-quantity {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.8rem 0;
+}
+
+.model-quantity .qty {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--bg-c);
+  color: var(--text-a);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.model-quantity .qty-val {
+  min-width: 2rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.duo-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 </style>

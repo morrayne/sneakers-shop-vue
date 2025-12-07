@@ -24,6 +24,7 @@ export interface product_item {
   id: number;
   color: string;
   size: string;
+  quantity?: number;
 }
 
 export interface sneaker_color {
@@ -46,6 +47,7 @@ export interface basket_item {
   gender: string;
   rating: number;
   cost: number;
+  quantity?: number;
 }
 
 interface filters {

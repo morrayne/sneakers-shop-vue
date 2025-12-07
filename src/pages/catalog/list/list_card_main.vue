@@ -26,12 +26,13 @@ function getTranslatedRub() {
 const active_color = ref(0);
 const displaySizes = ref(false);
 const activeSize = ref("42.0");
+const activeQuantity = ref(1);
 const timeoutId = ref<number | null | any>(null);
 const activeAction = ref<'basket' | 'favourite' | null>(null);
 const activeColorData = computed(() => props.data.colors?.[active_color.value]);
 const sizes = [ "40.0", "40.5", "41.0", "41.5", "42.0", "42.5", "43.0", "43.5", "44.0" ];
-const isFavourite = computed(() => global.user?.favourite.some((f) => f.id === props.data.id && f.color === activeColorData.value.name) ?? false);
-const inBasket = computed(() => global.user?.basket.some((f) => f.id === props.data.id && f.color === activeColorData.value.name) ?? false);
+const isFavourite = computed(() => global.user?.favourite.some((f) => f.id === props.data.id && f.color === activeColorData.value.name && f.size === activeSize.value) ?? false);
+const inBasket = computed(() => global.user?.basket.some((f) => f.id === props.data.id && f.color === activeColorData.value.name && f.size === activeSize.value) ?? false);
 
 // добавление в корзину
 async function handleAddToBasket(event: Event) {
@@ -40,14 +41,14 @@ async function handleAddToBasket(event: Event) {
     openSizes('basket');
     return;
   }
-  const itemExists = global.user?.basket.some((item) => item.id === props.data.id && item.color === activeColorData.value.name) ?? false;
+  const itemExists = global.user?.basket.some((item) => item.id === props.data.id && item.color === activeColorData.value.name && item.size === activeSize.value) ?? false;
   if (itemExists) {
     displaySizes.value = false;
     clearTimeout(timeoutId.value);
     return;
   }
   try {
-    await addToBasket({ id: props.data.id, color: props.data.colors[active_color.value].name, size: activeSize.value });
+    await addToBasket({ id: props.data.id, color: props.data.colors[active_color.value].name, size: activeSize.value, quantity: activeQuantity.value });
     displaySizes.value = false;
     clearTimeout(timeoutId.value);
   } catch (err: any) {
@@ -102,6 +103,16 @@ function selectSize(size: string, event: Event) {
   }
 }
 
+function incQuantity(event: Event) {
+  event.stopPropagation();
+  activeQuantity.value = Math.min(99, activeQuantity.value + 1);
+}
+
+function decQuantity(event: Event) {
+  event.stopPropagation();
+  activeQuantity.value = Math.max(1, activeQuantity.value - 1);
+}
+
 </script>
 
 <template>
@@ -129,6 +140,11 @@ function selectSize(size: string, event: Event) {
       <button :class="inBasket ? 'btn active' : 'btn'" v-if="global.user" @click="handleAddToBasket">
         {{ displaySizes && activeAction === 'basket' ? 'Select size' : `${props.data.cost} ${getTranslatedRub()}` }}
       </button>
+      <div class="qty-controls" v-if="global.user">
+        <button class="qty-btn" @click="decQuantity($event)">-</button>
+        <div class="qty-val">{{ activeQuantity }}</div>
+        <button class="qty-btn" @click="incQuantity($event)">+</button>
+      </div>
       <button :class="isFavourite ? 'fav active' : 'fav'" v-if="global.user" @click="toggleFavourite">
         <img src="/public/svg/heart.svg" />
       </button>
@@ -318,6 +334,32 @@ function selectSize(size: string, event: Event) {
       &:hover:not(:disabled) {
         background: var(--text-b);
       }
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--bg-d);
+      padding: 0.25rem;
+      border-radius: 0.5rem;
+    }
+
+    .qty-btn {
+      width: 1.6rem;
+      height: 1.6rem;
+      border: none;
+      background: transparent;
+      color: var(--text-a);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .qty-val {
+      min-width: 1.2rem;
+      text-align: center;
+      color: var(--text-a);
+      font-weight: 700;
     }
 
     :disabled {

@@ -97,11 +97,30 @@ export async function addToBasket(item: product_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
-  const newBasket = [...user.basket, item];
+  const newBasket = [...user.basket];
+  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+  if (idx >= 0) {
+    const existing = { ...newBasket[idx] } as any;
+    existing.quantity = (existing.quantity ?? 1) + (item.quantity ?? 1);
+    newBasket[idx] = existing;
+  } else {
+    newBasket.push({ ...item, quantity: item.quantity ?? 1 } as any);
+  }
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
+    // notify guest action
+    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+    if (findIdx >= 0) {
+      const qty = (newBasket[findIdx] as any).quantity ?? 1;
+      global.pushNotification(`Added to cart: ${qty} × size ${item.size}`, 'success');
+    }
   } else {
     await updateUserField("basket", newBasket);
+    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+    if (findIdx >= 0) {
+      const qty = (newBasket[findIdx] as any).quantity ?? 1;
+      global.pushNotification(`Added to cart: ${qty} × size ${item.size}`, 'success');
+    }
   }
 }
 
@@ -117,6 +136,38 @@ export async function removeFromBasket(item: product_item) {
   }
 }
 
+// Установить количество для элемента корзины (если quantity <= 0 — удалить элемент)
+export async function setBasketQuantity(item: product_item, quantity: number) {
+  const global = useGlobalState();
+  const user = global.user;
+  if (!user) return;
+  const newBasket = [...user.basket];
+  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+  if (idx === -1) return;
+  if (quantity <= 0) {
+    newBasket.splice(idx, 1);
+  } else {
+    const updated = { ...newBasket[idx], quantity } as any;
+    newBasket[idx] = updated;
+  }
+  if (isGuest(user)) {
+    global.updateUserField("basket", newBasket);
+    // notify
+    if (quantity <= 0) {
+      global.pushNotification(`Removed from cart: size ${item.size}`, 'info');
+    } else {
+      global.pushNotification(`Cart updated: ${quantity} × size ${item.size}`, 'success');
+    }
+  } else {
+    await updateUserField("basket", newBasket);
+    if (quantity <= 0) {
+      global.pushNotification(`Removed from cart: size ${item.size}`, 'info');
+    } else {
+      global.pushNotification(`Cart updated: ${quantity} × size ${item.size}`, 'success');
+    }
+  }
+}
+
 // ⭐ ИЗБРАННОЕ
 export async function addToFavourites(item: product_item) {
   const global = useGlobalState();
@@ -125,8 +176,10 @@ export async function addToFavourites(item: product_item) {
   const newFavs = [...user.favourite, item];
   if (isGuest(user)) {
     global.updateUserField("favourite", newFavs);
+    global.pushNotification(`Added to favourites: size ${item.size}`, 'success');
   } else {
     await updateUserField("favourite", newFavs);
+    global.pushNotification(`Added to favourites: size ${item.size}`, 'success');
   }
 }
 
@@ -137,8 +190,10 @@ export async function removeFromFavourites(item: product_item) {
   const newFavs = user.favourite.filter((f) => !(f.id === item.id && f.color === item.color && f.size === item.size));
   if (isGuest(user)) {
     global.updateUserField("favourite", newFavs);
+    global.pushNotification(`Removed from favourites: size ${item.size}`, 'info');
   } else {
     await updateUserField("favourite", newFavs);
+    global.pushNotification(`Removed from favourites: size ${item.size}`, 'info');
   }
 }
 
