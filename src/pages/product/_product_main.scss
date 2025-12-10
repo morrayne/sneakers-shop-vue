@@ -176,8 +176,8 @@ main {
         }
       }
 
-      :disabled {
-        cursor: not-allowed;
+      .inBasket {
+        background: var(--accent-a) !important;
       }
 
       .favourite {

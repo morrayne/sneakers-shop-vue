@@ -156,8 +156,8 @@ main .right .duo-button .cart img {
   height: 2rem;
   filter: invert(var(--svg-invert));
 }
-main .right .duo-button :disabled {
-  cursor: not-allowed;
+main .right .duo-button .inBasket {
+  background: var(--accent-a) !important;
 }
 main .right .duo-button .favourite {
   padding: 0.5rem;
