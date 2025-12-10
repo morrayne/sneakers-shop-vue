@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch, computed } from "vue";
 
 // pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
@@ -8,7 +8,7 @@ const global = useGlobalState();
 import { supabase } from "../../helper/imp/supabase";
 
 // router & actions
-import { addToBasket as addToBasketAction, addToFavourites as addToFavouritesAction } from "../../helper/actions";
+import { addToBasket as addToBasketAction, addToFavourites as addToFavouritesAction, removeFromFavourites as removeFromFavouritesAction } from "../../helper/actions";
 import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
@@ -25,6 +25,30 @@ const product = ref<any>(null);
 const selected = reactive({ main_photo: 0, color: 0, size: "40.0" as string });
 const quantity = ref<number>(1);
 const sizes = ["40.0","40.5","41.0","41.5","42.0","42.5","43.0","43.5","44.0"];
+
+// Компьютед свойства для проверки наличия товара
+const currentColorName = computed(() => {
+  return product.value?.colors?.[selected.color]?.name || "";
+});
+
+const isInBasket = computed(() => {
+  if (!global.user || !global.user.basket || !product.value) return false;
+  
+  return global.user.basket.some((item) => 
+    item.id === product.value.id && 
+    item.color === currentColorName.value && 
+    item.size === selected.size
+  );
+});
+
+const isInFavourites = computed(() => {
+  if (!global.user || !global.user.favourite || !product.value) return false;
+  
+  return global.user.favourite.some((item) => 
+    item.id === product.value.id && 
+    item.color === currentColorName.value
+  );
+});
 
 // Функция для получения переведенного текста
 function getTranslatedText(key: string) {
@@ -63,27 +87,57 @@ function openCatalogFilter(type: 'brand' | 'gender' | 'color' | 'id', value: str
   router.push({ path: '/catalog', query });
 }
 
-// добавление в избранное
-async function addToFavourite() {
+// добавление/удаление из избранного
+async function toggleFavourite() {
   try {
     const product_id = product.value.id;
-    const colorName = product.value.colors[selected.color].name;
-    if (!global.user) return;
-    // Используем единый экшен для избранного
-    await addToFavouritesAction({ id: product_id, color: colorName, size: selected.size });
+    const colorName = currentColorName.value;
+    if (!global.user || !product.value) return;
+    
+    if (isInFavourites.value) {
+      // Удаляем из избранного
+      await removeFromFavouritesAction({ id: product_id, color: colorName });
+    } else {
+      // Добавляем в избранное
+      await addToFavouritesAction({ id: product_id, color: colorName });
+    }
   } catch (err) {
     console.error("❌ Ошибка при обновлении избранного:", err);
   }
 }
 
-// Добавление в корзину
-async function addToBasket() {
+// Добавление/удаление из корзины
+async function toggleBasket() {
   try {
     const product_id = product.value.id;
-    const colorName = product.value.colors[selected.color].name;
-    if (!global.user) return;
-    // Используем общий экшен для корзины — он объединяет по id/color/size и учитывает quantity
-    await addToBasketAction({ id: product_id, color: colorName, size: selected.size, quantity: quantity.value });
+    const colorName = currentColorName.value;
+    if (!global.user || !product.value) return;
+    
+    if (isInBasket.value) {
+      // Удаляем из корзины - находим элемент и удаляем его
+      const updatedBasket = global.user.basket.filter((item) => 
+        !(item.id === product_id && 
+          item.color === colorName && 
+          item.size === selected.size)
+      );
+      
+      // Обновляем корзину через updateUserField
+      if (global.user.id === "Guest") {
+        global.user.basket = updatedBasket;
+      } else {
+        // Нужна функция removeFromBasket или использование updateUserField
+        const { updateUserField } = await import("../../helper/actions");
+        await updateUserField("basket", updatedBasket);
+      }
+    } else {
+      // Добавляем в корзину
+      await addToBasketAction({ 
+        id: product_id, 
+        color: colorName, 
+        size: selected.size, 
+        quantity: quantity.value 
+      });
+    }
   } catch (err) {
     console.error("❌ Ошибка при обновлении корзины:", err);
   }
@@ -109,7 +163,13 @@ onMounted(async () => {
         </div>
         <div class="main-img">
           <div class="colors-c" v-if="product.colors.length !== 1">
-            <button class="c" v-for="(value, index) in product.colors" :style="{background: value.folder_name}" @click="selected.color = index"></button>
+            <button 
+              class="c" 
+              v-for="(value, index) in product.colors" 
+              :style="{background: value.folder_name}" 
+              @click="selected.color = index"
+              :class="{ active: selected.color === index }"
+            ></button>
           </div>
           <img :src="`/sneakers/${product.id}-${product.colors?.[selected.color].folder_name}/${selected.main_photo}.jpg`" alt="" />
         </div>
@@ -127,27 +187,47 @@ onMounted(async () => {
         </div>
         <div class="model-cost">{{ product.cost }}.00 {{ getTranslatedText('rub') }}</div>
         <div class="model-colors">
-          <div class="img-wrapper" v-for="(color, index) in product.colors" :key="index" @click="selected.color = index">
+          <div 
+            class="img-wrapper" 
+            v-for="(color, index) in product.colors" 
+            :key="index" 
+            @click="selected.color = index"
+            :class="{ active: selected.color === index }"
+          >
             <img :src="`/sneakers/${product.id}-${color.folder_name}/0.jpg`" />
           </div>
         </div>
         <div class="model-sizes">
-          <div :class="selected.size === value ? 'active-size' : 'size'" v-for="value in sizes" @click="selected.size = value">
+          <div 
+            :class="selected.size === value ? 'active-size' : 'size'" 
+            v-for="value in sizes" 
+            @click="selected.size = value"
+          >
             {{ value }}
           </div>
         </div>
        
         <div class="duo-button">
-          <button class="cart" @click="addToBasket()">
+          <button 
+            class="cart" 
+            @click="toggleBasket()"
+            :class="{ inBasket: isInBasket }"
+          >
             <img src="/svg/bag.svg" alt="" />
-            <span>{{ getTranslatedText('addToCart') }}</span>
+            <span>
+              {{ isInBasket ? getTranslatedText('removeFromCart') : getTranslatedText('addToCart') }}
+            </span>
           </button>
           <div class="model-quantity">
             <button class="qty" @click="quantity = Math.max(1, quantity - 1)">-</button>
             <div class="qty-val">{{ quantity }}</div>
             <button class="qty" @click="quantity = Math.min(99, quantity + 1)">+</button>
           </div>
-          <button class="favourite" @click="addToFavourite()">
+          <button 
+            class="favourite" 
+            @click="toggleFavourite()"
+            :class="{ inFavourites: isInFavourites }"
+          >
             <img src="/svg/heart.svg" alt="" />
           </button>
         </div>

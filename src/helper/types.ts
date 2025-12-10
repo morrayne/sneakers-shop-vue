@@ -4,9 +4,9 @@ export interface user_type {
   password: string;
   name: string;
   icon: number;
-  favourite: product_item[];
-  basket: product_item[];
-  history: product_item[];
+  favourite: favourite_item[];
+  basket: basket_item[];
+  history: basket_item[];
 }
 
 export interface sneaker_item {
@@ -20,11 +20,17 @@ export interface sneaker_item {
   rating: number;
 }
 
-export interface product_item {
+export interface favourite_item {
   id: number;
   color: string;
-  size: string;
   quantity?: number;
+}
+
+export interface basket_item {
+  id: number;
+  color: string;
+  quantity?: number;
+  size?: string;
 }
 
 export interface sneaker_color {
@@ -38,7 +44,7 @@ export interface color_item {
   folder_name: string;
 }
 
-export interface basket_item {
+export interface basket_item_s {
   id: number;
   name: string;
   favouriteColor: number;
@@ -100,7 +106,7 @@ export interface history_item {
 export interface order_item {
   id: number;
   date: string;
-  items: product_item[];
+  items: basket_item[];
   total: number;
   status: string;
 }

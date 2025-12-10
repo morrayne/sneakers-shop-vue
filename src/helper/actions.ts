@@ -1,7 +1,7 @@
 // imports
 import { supabase } from "./imp/supabase";
 import { useGlobalState } from "./pinia";
-import type { user_type, product_item } from "./types";
+import type { user_type, favourite_item, basket_item } from "./types";
 
 // 🔧 Проверка гостя
 function isGuest(user: user_type | null): boolean { return !user || user.id === "Guest" }
@@ -93,12 +93,12 @@ export async function syncPiniaAndSupabase(user_id: string) {
 }
 
 // 🛒 КОРЗИНА
-export async function addToBasket(item: product_item) {
+export async function addToBasket(item: basket_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
   const newBasket = [...user.basket];
-  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
   if (idx >= 0) {
     const existing = { ...newBasket[idx] } as any;
     existing.quantity = (existing.quantity ?? 1) + (item.quantity ?? 1);
@@ -109,26 +109,26 @@ export async function addToBasket(item: product_item) {
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
     // notify guest action
-    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
     if (findIdx >= 0) {
       const qty = (newBasket[findIdx] as any).quantity ?? 1;
-      global.pushNotification(`Added to cart: ${qty} × size ${item.size}`, 'success');
+      global.pushNotification(`Added to cart: ${qty} ×`, 'success');
     }
   } else {
     await updateUserField("basket", newBasket);
-    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
     if (findIdx >= 0) {
       const qty = (newBasket[findIdx] as any).quantity ?? 1;
-      global.pushNotification(`Added to cart: ${qty} × size ${item.size}`, 'success');
+      global.pushNotification(`Added to cart: ${qty} ×`, 'success');
     }
   }
 }
 
-export async function removeFromBasket(item: product_item) {
+export async function removeFromBasket(item: basket_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
-  const newBasket = user.basket.filter((b) => !(b.id === item.id && b.color === item.color && b.size === item.size));
+  const newBasket = user.basket.filter((b) => !(b.id === item.id && b.color === item.color));
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
   } else {
@@ -137,12 +137,12 @@ export async function removeFromBasket(item: product_item) {
 }
 
 // Установить количество для элемента корзины (если quantity <= 0 — удалить элемент)
-export async function setBasketQuantity(item: product_item, quantity: number) {
+export async function setBasketQuantity(item: basket_item, quantity: number) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
   const newBasket = [...user.basket];
-  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color && b.size === item.size);
+  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
   if (idx === -1) return;
   if (quantity <= 0) {
     newBasket.splice(idx, 1);
@@ -154,46 +154,46 @@ export async function setBasketQuantity(item: product_item, quantity: number) {
     global.updateUserField("basket", newBasket);
     // notify
     if (quantity <= 0) {
-      global.pushNotification(`Removed from cart: size ${item.size}`, 'info');
+      global.pushNotification(`Removed from cart`, 'info');
     } else {
-      global.pushNotification(`Cart updated: ${quantity} × size ${item.size}`, 'success');
+      global.pushNotification(`Cart updated: ${quantity} ×`, 'success');
     }
   } else {
     await updateUserField("basket", newBasket);
     if (quantity <= 0) {
-      global.pushNotification(`Removed from cart: size ${item.size}`, 'info');
+      global.pushNotification(`Removed from cart`, 'info');
     } else {
-      global.pushNotification(`Cart updated: ${quantity} × size ${item.size}`, 'success');
+      global.pushNotification(`Cart updated: ${quantity}`, 'success');
     }
   }
 }
 
 // ⭐ ИЗБРАННОЕ
-export async function addToFavourites(item: product_item) {
+export async function addToFavourites(item: favourite_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
   const newFavs = [...user.favourite, item];
   if (isGuest(user)) {
     global.updateUserField("favourite", newFavs);
-    global.pushNotification(`Added to favourites: size ${item.size}`, 'success');
+    global.pushNotification(`Added to favourites`, 'success');
   } else {
     await updateUserField("favourite", newFavs);
-    global.pushNotification(`Added to favourites: size ${item.size}`, 'success');
+    global.pushNotification(`Added to favourites`, 'success');
   }
 }
 
-export async function removeFromFavourites(item: product_item) {
+export async function removeFromFavourites(item: favourite_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
-  const newFavs = user.favourite.filter((f) => !(f.id === item.id && f.color === item.color && f.size === item.size));
+  const newFavs = user.favourite.filter((f) => !(f.id === item.id && f.color === item.color));
   if (isGuest(user)) {
     global.updateUserField("favourite", newFavs);
-    global.pushNotification(`Removed from favourites: size ${item.size}`, 'info');
+    global.pushNotification(`Removed from favourites`, 'info');
   } else {
     await updateUserField("favourite", newFavs);
-    global.pushNotification(`Removed from favourites: size ${item.size}`, 'info');
+    global.pushNotification(`Removed from favourites`, 'info');
   }
 }
 

@@ -5,20 +5,36 @@ import { ref, computed, onMounted } from "vue";
 // router & pinia
 import { useGlobalState } from "../../../helper/pinia";
 const global = useGlobalState();
-import { addToBasket, addToFavourites, removeFromFavourites } from "../../../helper/actions";
+import {
+  addToBasket,
+  addToFavourites,
+  removeFromFavourites,
+} from "../../../helper/actions";
 import router from "../../../helper/router";
-function navigateToProduct() { router.push(`/product/${props.data.id}`) }
+function navigateToProduct() {
+  router.push(`/product/${props.data.id}`);
+}
 
 // props
 const props = defineProps<{ data: any }>();
 
 // монтирование
-onMounted(() => { active_color.value = props.data.displayColor ?? 0 });
-onMounted(() => { return () => { if (timeoutId.value) { clearTimeout(timeoutId.value) }}});
+onMounted(() => {
+  active_color.value = props.data.displayColor ?? 0;
+});
+onMounted(() => {
+  return () => {
+    if (timeoutId.value) {
+      clearTimeout(timeoutId.value);
+    }
+  };
+});
 
 // Функция для получения переведенной валюты
 function getTranslatedRub() {
-  const value = getComputedStyle(document.documentElement).getPropertyValue("--rub");
+  const value = getComputedStyle(document.documentElement).getPropertyValue(
+    "--rub"
+  );
   return value ? value.replace(/^"(.*)"$/, "$1") : "rub";
 }
 
@@ -28,27 +44,67 @@ const displaySizes = ref(false);
 const activeSize = ref("42.0");
 const activeQuantity = ref(1);
 const timeoutId = ref<number | null | any>(null);
-const activeAction = ref<'basket' | 'favourite' | null>(null);
+const activeAction = ref<"basket" | "favourite" | null>(null);
 const activeColorData = computed(() => props.data.colors?.[active_color.value]);
-const sizes = [ "40.0", "40.5", "41.0", "41.5", "42.0", "42.5", "43.0", "43.5", "44.0" ];
-const isFavourite = computed(() => global.user?.favourite.some((f) => f.id === props.data.id && f.color === activeColorData.value.name && f.size === activeSize.value) ?? false);
-const inBasket = computed(() => global.user?.basket.some((f) => f.id === props.data.id && f.color === activeColorData.value.name && f.size === activeSize.value) ?? false);
+const sizes = [
+  "40.0",
+  "40.5",
+  "41.0",
+  "41.5",
+  "42.0",
+  "42.5",
+  "43.0",
+  "43.5",
+  "44.0",
+];
+const isFavourite = computed(
+  () =>
+    global.user?.favourite.some(
+      (f) => f.id === props.data.id && f.color === activeColorData.value.name
+    ) ?? false
+);
+const inBasket = computed(
+  () =>
+    global.user?.basket.some(
+      (f) =>
+        f.id === props.data.id &&
+        f.color === activeColorData.value.name &&
+        f.size === activeSize.value
+    ) ?? false
+);
 
 // добавление в корзину
 async function handleAddToBasket(event: Event) {
   event.stopPropagation();
   if (!displaySizes.value) {
-    openSizes('basket');
+    openSizes("basket");
     return;
   }
-  const itemExists = global.user?.basket.some((item) => item.id === props.data.id && item.color === activeColorData.value.name && item.size === activeSize.value) ?? false;
+
+  // Для корзины проверяем по цвету И размеру
+  const itemExists =
+    global.user?.basket.some(
+      (item) =>
+        item.id === props.data.id &&
+        item.color === activeColorData.value.name &&
+        item.size === activeSize.value
+    ) ?? false;
+
   if (itemExists) {
     displaySizes.value = false;
     clearTimeout(timeoutId.value);
     return;
   }
+
   try {
-    await addToBasket({ id: props.data.id, color: props.data.colors[active_color.value].name, size: activeSize.value, quantity: activeQuantity.value });
+    // Для корзины добавляем с размером
+    const basketItem = {
+      id: props.data.id,
+      color: activeColorData.value.name,
+      size: activeSize.value,
+      quantity: activeQuantity.value,
+    };
+    await addToBasket(basketItem);
     displaySizes.value = false;
     clearTimeout(timeoutId.value);
   } catch (err: any) {
@@ -59,21 +115,15 @@ async function handleAddToBasket(event: Event) {
 // добавление в избранное
 async function toggleFavourite(event: Event) {
   event.stopPropagation();
-  if (!displaySizes.value) {
-    openSizes('favourite');
-    return;
-  }
-  try {
-    const item = { id: props.data.id, color: props.data.colors[active_color.value].name, size: activeSize.value };
-    if (isFavourite.value) {
-      await removeFromFavourites(item);
-    } else {
-      await addToFavourites(item);
-    }
-    displaySizes.value = false;
-    clearTimeout(timeoutId.value);
-  } catch (err: any) {
-    console.error(err);
+  const favouriteItem = {
+    id: props.data.id,
+    color: activeColorData.value.name,
+    quantity: activeQuantity.value,
+  };
+  if (isFavourite.value) {
+    await removeFromFavourites(favouriteItem);
+  } else {
+    await addToFavourites(favouriteItem);
   }
 }
 
@@ -83,10 +133,12 @@ function setActiveColor(val: number, event: Event) {
   active_color.value = val;
 }
 
-function openSizes(action: 'basket' | 'favourite') {
+function openSizes(action: "basket" | "favourite") {
   displaySizes.value = true;
   activeAction.value = action;
-  if (timeoutId.value) { clearTimeout(timeoutId.value) }
+  if (timeoutId.value) {
+    clearTimeout(timeoutId.value);
+  }
   timeoutId.value = setTimeout(() => {
     displaySizes.value = false;
     activeAction.value = null;
@@ -96,9 +148,10 @@ function openSizes(action: 'basket' | 'favourite') {
 function selectSize(size: string, event: Event) {
   event.stopPropagation();
   activeSize.value = size;
-  if (activeAction.value === 'basket') {
+  if (activeAction.value === "basket") {
     handleAddToBasket(event);
-  } else if (activeAction.value === 'favourite') {
+  } else if (activeAction.value === "favourite") {
+    // Для избранного вызываем toggleFavourite, который теперь обрабатывает добавление
     toggleFavourite(event);
   }
 }
@@ -112,23 +165,43 @@ function decQuantity(event: Event) {
   event.stopPropagation();
   activeQuantity.value = Math.max(1, activeQuantity.value - 1);
 }
-
 </script>
 
 <template>
   <div class="card" @click="navigateToProduct">
     <div class="img-holder">
       <div class="size-options" v-if="displaySizes">
-        <button v-for="value in sizes" :key="value" :class="{ active: activeSize === value }" @click="selectSize(value, $event)">
+        <button
+          v-for="value in sizes"
+          :key="value"
+          :class="{ active: activeSize === value }"
+          @click="selectSize(value, $event)"
+        >
           {{ value }}
         </button>
       </div>
       <div class="color-wrapper">
-        <button v-for="(value, index) in props.data.colors" v-if="props.data.colors.length !== 1" :key="index" class="color" :style="{ background: value.folder_name }" @click="setActiveColor(index, $event)"></button>
+        <button
+          v-for="(value, index) in props.data.colors"
+          v-if="props.data.colors.length !== 1"
+          :key="index"
+          class="color"
+          :style="{ background: value.folder_name }"
+          @click="setActiveColor(index, $event)"
+        ></button>
         <div class="rating">{{ props.data.rating }} / 100</div>
       </div>
-      <img v-if="props.data.colors[active_color]" :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/1.jpg`" alt="product img" />
-      <img v-if="props.data.colors[active_color]" :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/0.jpg`" alt="product img" class="dis" />
+      <img
+        v-if="props.data.colors[active_color]"
+        :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/1.jpg`"
+        alt="product img"
+      />
+      <img
+        v-if="props.data.colors[active_color]"
+        :src="`./sneakers/${props.data.id}-${props.data.colors[active_color].folder_name}/0.jpg`"
+        alt="product img"
+        class="dis"
+      />
     </div>
     <p class="name">{{ props.data.name }}</p>
     <p class="sub-name">{{ props.data.colors[active_color].name }}</p>
@@ -137,15 +210,27 @@ function decQuantity(event: Event) {
       <div class="tag">{{ props.data.gender }}</div>
     </div>
     <div class="duo">
-      <button :class="inBasket ? 'btn active' : 'btn'" v-if="global.user" @click="handleAddToBasket">
-        {{ displaySizes && activeAction === 'basket' ? 'Select size' : `${props.data.cost} ${getTranslatedRub()}` }}
+      <button
+        :class="inBasket ? 'btn active' : 'btn'"
+        v-if="global.user"
+        @click="handleAddToBasket"
+      >
+        {{
+          displaySizes && activeAction === "basket"
+            ? "Select size"
+            : `${props.data.cost} ${getTranslatedRub()}`
+        }}
       </button>
       <div class="qty-controls" v-if="global.user">
         <button class="qty-btn" @click="decQuantity($event)">-</button>
         <div class="qty-val">{{ activeQuantity }}</div>
         <button class="qty-btn" @click="incQuantity($event)">+</button>
       </div>
-      <button :class="isFavourite ? 'fav active' : 'fav'" v-if="global.user" @click="toggleFavourite">
+      <button
+        :class="isFavourite ? 'fav active' : 'fav'"
+        v-if="global.user"
+        @click="toggleFavourite"
+      >
         <img src="/public/svg/heart.svg" />
       </button>
     </div>

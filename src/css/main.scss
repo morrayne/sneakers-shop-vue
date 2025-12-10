@@ -168,6 +168,7 @@ svg {
   --nameErr: "Пароль должно быть минимум из 3 символов";
   --reuseErr: "Такая почта уже занята или неверный пароль";
   --noFilters: "По фильтрам ничего не найдено";
+  --removeFromCart: "Удалить из корзины";
 }
 
 :root[lang="en"] {
@@ -219,4 +220,5 @@ svg {
   --nameErr: "Name should contain at least 3 digits";
   --reuseErr: "Email already taken or wrong password";
   --noFilters: "Nothing found via filters";
+  --removeFromCart: "Remove from cart";
 }

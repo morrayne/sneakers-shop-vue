@@ -15,7 +15,9 @@ import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
 // types & vars
-const totalCost = computed(() => { return basketItems.value.reduce((sum, item) => sum + ((item.cost || 0) * (item.quantity ?? 1)), 0) });
+const totalCost = computed(() => { 
+  return basketItems.value.reduce((sum, item) => sum + ((item.cost || 0) * (item.quantity ?? 1)), 0) 
+});
 import type { sneaker_color, product_item } from "../../helper/types";
 
 // state
@@ -37,7 +39,6 @@ function getTranslatedRub() {
 
 // загрузка всех кроссовок
 async function loadSneakers() {
-  loading.value = true;
   error.value = null;
   try {
     const { data, error: supabaseError } = await supabase.from("sneakers").select("*");
@@ -63,7 +64,15 @@ const basketItems = computed(() => {
     if (!sneaker) return null;
     const colors = sneaker.colors as sneaker_color[];
     const colorIndex = typeof basketItem.color === "number" ? basketItem.color : colors.findIndex((c) => c.name === basketItem.color);
-    return { ...sneaker, favouriteColor: colorIndex >= 0 ? colorIndex : 0, favouriteSize: basketItem.size, quantity: basketItem.quantity ?? 1 };
+    return { 
+      ...sneaker, 
+      favouriteColor: colorIndex >= 0 ? colorIndex : 0, 
+      favouriteSize: basketItem.size, 
+      quantity: basketItem.quantity ?? 1,
+      basketItemId: basketItem.id,
+      basketItemColor: basketItem.color,
+      basketItemSize: basketItem.size
+    };
   }).filter(Boolean);
 });
 
@@ -77,11 +86,55 @@ async function handleItemRemoved(itemId: number, colorIndex: number, size: strin
     const itemColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
     return !(sameId && sameSize && itemColorIndex === colorIndex);
   });
+  
   if (user.id === "Guest") { 
     global.updateUserField("basket", updatedBasket);
-  } 
-  else { 
-    await updateUserField("basket", updatedBasket)
+  } else { 
+    await updateUserField("basket", updatedBasket);
+  }
+}
+
+// изменение размера элемента в корзине
+async function handleSizeChanged(itemId: number, colorIndex: number, oldSize: string, newSize: string) {
+  const user = global.user;
+  if (!user || !user.basket) return;
+  
+  // Находим элемент в корзине
+  const itemIndex = user.basket.findIndex((item: product_item) => {
+    const sameId = item.id === itemId;
+    const sameSize = item.size === oldSize;
+    const itemColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
+    return sameId && sameSize && itemColorIndex === colorIndex;
+  });
+  
+  if (itemIndex === -1) return;
+  
+  // Проверяем, есть ли уже такой же товар с новым размером
+  const existingItemIndex = user.basket.findIndex((item: product_item, index: number) => {
+    if (index === itemIndex) return false; // Пропускаем текущий элемент
+    const sameId = item.id === itemId;
+    const sameColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
+    return sameId && sameColorIndex === colorIndex && item.size === newSize;
+  });
+  
+  let updatedBasket = [...user.basket];
+  
+  if (existingItemIndex !== -1) {
+    // Если такой товар с новым размером уже есть, объединяем количество и удаляем старый
+    const existingItem = updatedBasket[existingItemIndex];
+    const currentItem = updatedBasket[itemIndex];
+    updatedBasket[existingItemIndex] = { ...existingItem, quantity: (existingItem.quantity || 1) + (currentItem.quantity || 1)};
+    // Удаляем старый элемент
+    updatedBasket.splice(itemIndex, 1);
+  } else {
+    // Просто обновляем размер
+    updatedBasket[itemIndex] = { ...updatedBasket[itemIndex], size: newSize };
+  }
+  
+  if (user.id === "Guest") {
+    global.updateUserField("basket", updatedBasket);
+  } else {
+    await updateUserField("basket", updatedBasket);
   }
 }
 
@@ -112,13 +165,11 @@ async function moveBasketToHistory() {
   }
 }
 
-// монтирование и отслеживание изменений
+// монтирование
 onMounted(() => { loadSneakers() });
 
-// следим за изменением корзины
-watch(() => global.user?.basket, () => {
-  if (global.user) loadSneakers();
-}, { deep: true });
+// УБИРАЕМ WATCH, КОТОРЫЙ ВЫЗЫВАЛ ПЕРЕЗАГРУЗКУ ПРИ КАЖДОМ ИЗМЕНЕНИИ КОРЗИНЫ
+// watch(() => global.user?.basket, () => { if (global.user) reLoadSneakers() }, { deep: true });
 </script>
 
 <template>
@@ -129,7 +180,14 @@ watch(() => global.user?.basket, () => {
         <div v-if="loading" class="loa">
           <loading_main />
         </div>
-        <basket_item v-else-if="basketItems.length > 0" v-for="item in basketItems" :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`" :data="item" @item-removed="handleItemRemoved" />
+        <basket_item 
+          v-else-if="basketItems.length > 0" 
+          v-for="item in basketItems" 
+          :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`" 
+          :data="item" 
+          @item-removed="handleItemRemoved"
+          @size-changed="handleSizeChanged"
+        />
         <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
           <p> {{ getTranslatedText('emptyBasket') }} </p>

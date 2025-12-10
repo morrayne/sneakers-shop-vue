@@ -10,6 +10,7 @@ import header_main from "../../common/header/header_main.vue";
 import sidebar_main from "./sidebar/sidebar_main.vue";
 import list_main from "./list/list_main.vue";
 import sidebar_filler from "./fillers/sidebar_filler.vue";
+import loading_main from "../../common/loading/loading_main.vue";
 
 // supabase & types
 import { supabase } from "../../helper/imp/supabase";
@@ -107,8 +108,9 @@ watch(() => route.query, (newQ) => {
         <sidebar_main v-if="!loading && color_array.length !== 0 && brand_array.length !== 0 && gender_array.length !== 0" :color_array="color_array" :brand_array="brand_array" :gender_array="gender_array" />
         <sidebar_filler v-else />
       </div>
-      <div class="right">
-        <list_main />
+      <div :class="loading ? 'center' : 'right'">
+        <loading_main v-if="loading" />
+        <list_main v-else />
       </div>
     </main>
   </wrapper_main>
@@ -144,6 +146,12 @@ main {
   }
   ::-webkit-scrollbar {
     display: none;
+  }
+  .center {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

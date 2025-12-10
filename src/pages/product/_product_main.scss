@@ -185,14 +185,16 @@ main {
         background: var(--bg-c);
         border-radius: 0.25rem;
         cursor: pointer;
+        transition: 0.4s;
 
         img {
           height: 2rem;
           filter: invert(var(--svg-invert));
         }
       }
-      :disabled {
-        cursor: not-allowed;
+
+      .inFavourites {
+        background: var(--accent-a);
       }
     }
   }
