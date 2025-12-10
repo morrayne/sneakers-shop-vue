@@ -40,7 +40,6 @@ const global = useGlobalState();
 
   .header-nav {
     width: 100%;
-    min-height: 4rem;
     height: 100%;
     display: flex;
     position: absolute;
@@ -49,7 +48,7 @@ const global = useGlobalState();
     justify-content: center;
     align-items: center;
 
-    a {
+    * {
       height: 100%;
       color: var(--main-header-text);
       padding: 0 2rem;
@@ -100,7 +99,6 @@ const global = useGlobalState();
     }
     
     .header-nav a {
-      min-height: 3.5rem;
       padding: 0 1.5rem;
       font-size: 0.9rem;
     }
@@ -120,10 +118,6 @@ const global = useGlobalState();
     
     .logo {
       font-size: 1.1rem;
-    }
-
-    .header-nav {
-      min-height: 3rem;
     }
     
     .header-nav a {
@@ -147,10 +141,6 @@ const global = useGlobalState();
     .logo {
       font-size: 0.8rem;
     }
-
-    .header-nav {
-      min-height: 2.5rem;
-    }
     
     .header-nav a {
       padding: 0 0.7rem;
@@ -172,10 +162,6 @@ const global = useGlobalState();
     
     .logo {
       display: none;
-    }
-
-    .header-nav {
-      min-height: 2rem;
     }
     
     .header-nav a {

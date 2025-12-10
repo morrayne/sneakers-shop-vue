@@ -120,39 +120,37 @@ watch(() => route.query, (newQ) => {
 main {
   height: 100%;
   display: flex;
-  overflow: hidden;
 
   .left {
     width: 18rem;
-    min-height: 16rem;
     padding: 1rem;
     border-right: solid 0.125rem var(--bg-c);
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    overflow-y: scroll;
+    overflow-y: auto; // Для скролла если контент не помещается
   }
-  ::-webkit-scrollbar {
-    display: none;
-  }
+  
   .right {
     width: calc(100% - 18rem);
     padding: 1rem;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
-    overflow-y: scroll;
-    position: relative;
+    overflow-y: auto; // Для скролла если контент не помещается
   }
-  ::-webkit-scrollbar {
-    display: none;
-  }
+  
   .center {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+}
+
+/* Скрываем скроллбар для более чистого вида */
+::-webkit-scrollbar {
+  display: none;
 }
 
 /* Планшеты горизонтальные */
@@ -178,7 +176,6 @@ main {
   main {
     .left {
       max-width: 16rem;
-      height: 100%;
     }
     
     .right {
@@ -191,6 +188,8 @@ main {
 /* Большие телефоны */
 @media (max-width: 1024px) {
   main {
+    gap: 0rem;
+
     .right {
       gap: 0.8rem;
       padding: 0.8rem;
@@ -199,28 +198,36 @@ main {
     .left {
       padding: 0.8rem;
       gap: 0.8rem;
+      position: relative;
     }
   }
 }
 
-/* Телефоны */
+/* Телефоны - ОСНОВНОЕ ИСПРАВЛЕНИЕ */
 @media (max-width: 768px) {
   main {
     flex-direction: column;
+    overflow-y: auto; 
+    height: 100%; 
 
     .right {
       width: 100%;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
-      padding: 0.6rem;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      overflow-y: visible;
+      min-height: 0;
     }
     
     .left {
       max-width: unset;
       width: 100%;
-      padding: 0.6rem;
+      padding: 3.5rem 0.6rem 0;
       gap: 0.6rem;
-      max-height: 18rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      overflow-y: visible;
+      flex-shrink: 0;
     }
   }
 }
@@ -228,16 +235,13 @@ main {
 /* Маленькие телефоны */
 @media (max-width: 480px) {
   main {
+
     .right {
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      padding: 0.5rem;
+      grid-template-columns: repeat(1, 1fr);
     }
     
     .left {
-      padding: 0.5rem;
       gap: 0.5rem;
-      max-height: 16rem;
     }
   }
 }
@@ -251,7 +255,6 @@ main {
     }
     
     .left {
-      padding: 0.4rem;
       gap: 0.4rem;
     }
   }

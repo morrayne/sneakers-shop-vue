@@ -45,8 +45,12 @@ const activeBrand = computed(() => filterState.state.filters.brand);
 
 /* Телефоны */
 @media (max-width: 768px) {
-  .filter-holder .size {
-    font-size: 1rem;
+  .filter-holder {
+    width: 100%;
+
+    .size {
+      font-size: 1rem;
+    }
   }
 }
 

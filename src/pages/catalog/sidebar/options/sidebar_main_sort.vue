@@ -69,8 +69,12 @@ function handleSortClick(optionVal: string) {
 
 /* Телефоны */
 @media (max-width: 768px) {
-  .filter-holder .size {
-    font-size: 1rem;
+  .filter-holder {
+    width: 100%;
+
+    .size {
+      font-size: 1rem;
+    }
   }
 }
 

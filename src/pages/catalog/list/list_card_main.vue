@@ -80,24 +80,7 @@ async function handleAddToBasket(event: Event) {
     openSizes("basket");
     return;
   }
-
-  // Для корзины проверяем по цвету И размеру
-  const itemExists =
-    global.user?.basket.some(
-      (item) =>
-        item.id === props.data.id &&
-        item.color === activeColorData.value.name &&
-        item.size === activeSize.value
-    ) ?? false;
-
-  if (itemExists) {
-    displaySizes.value = false;
-    clearTimeout(timeoutId.value);
-    return;
-  }
-
   try {
-    // Для корзины добавляем с размером
     const basketItem = {
       id: props.data.id,
       color: activeColorData.value.name,
@@ -457,7 +440,7 @@ function decQuantity(event: Event) {
 /* Адаптация для планшетов */
 @media (max-width: 1024px) {
   .card {
-    padding: 0.8rem;
+    padding: 0.6rem;
     gap: 0.2rem;
 
     .name {
@@ -491,6 +474,10 @@ function decQuantity(event: Event) {
 
     .duo {
       height: 1.8rem;
+
+      .btn {
+        font-size: 0.8rem;
+      }
 
       .fav img {
         width: 1rem;

@@ -97,26 +97,47 @@ export async function addToBasket(item: basket_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
+  
   const newBasket = [...user.basket];
-  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+  
+  // 🔴 ПРОБЛЕМА: Не учитывает размер при поиске!
+  // Было: const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+  
+  // ✅ ИСПРАВЛЕНО: Теперь учитываем размер
+  const idx = newBasket.findIndex((b) => 
+    b.id === item.id && 
+    b.color === item.color && 
+    b.size === item.size // Добавили проверку размера
+  );
+  
   if (idx >= 0) {
+    // Обновляем существующий товар с таким же id, цветом И размером
     const existing = { ...newBasket[idx] } as any;
     existing.quantity = (existing.quantity ?? 1) + (item.quantity ?? 1);
     newBasket[idx] = existing;
   } else {
+    // Добавляем как новый товар (возможно с другим размером)
     newBasket.push({ ...item, quantity: item.quantity ?? 1 } as any);
   }
+  
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
-    // notify guest action
-    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+    const findIdx = newBasket.findIndex((b) => 
+      b.id === item.id && 
+      b.color === item.color && 
+      b.size === item.size
+    );
     if (findIdx >= 0) {
       const qty = (newBasket[findIdx] as any).quantity ?? 1;
       global.pushNotification(`Added to cart: ${qty} ×`, 'success');
     }
   } else {
     await updateUserField("basket", newBasket);
-    const findIdx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+    const findIdx = newBasket.findIndex((b) => 
+      b.id === item.id && 
+      b.color === item.color && 
+      b.size === item.size
+    );
     if (findIdx >= 0) {
       const qty = (newBasket[findIdx] as any).quantity ?? 1;
       global.pushNotification(`Added to cart: ${qty} ×`, 'success');
@@ -128,7 +149,17 @@ export async function removeFromBasket(item: basket_item) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
-  const newBasket = user.basket.filter((b) => !(b.id === item.id && b.color === item.color));
+  
+  // 🔴 ПРОБЛЕМА: Не учитывает размер при удалении!
+  // Было: const newBasket = user.basket.filter((b) => !(b.id === item.id && b.color === item.color));
+  
+  // ✅ ИСПРАВЛЕНО: Теперь учитываем размер
+  const newBasket = user.basket.filter((b) => 
+    !(b.id === item.id && 
+      b.color === item.color && 
+      b.size === item.size) // Добавили проверку размера
+  );
+  
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
   } else {
@@ -141,18 +172,30 @@ export async function setBasketQuantity(item: basket_item, quantity: number) {
   const global = useGlobalState();
   const user = global.user;
   if (!user) return;
+  
   const newBasket = [...user.basket];
-  const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+  
+  // 🔴 ПРОБЛЕМА: Не учитывает размер при поиске!
+  // Было: const idx = newBasket.findIndex((b) => b.id === item.id && b.color === item.color);
+  
+  // ✅ ИСПРАВЛЕНО: Теперь учитываем размер
+  const idx = newBasket.findIndex((b) => 
+    b.id === item.id && 
+    b.color === item.color && 
+    b.size === item.size // Добавили проверку размера
+  );
+  
   if (idx === -1) return;
+  
   if (quantity <= 0) {
     newBasket.splice(idx, 1);
   } else {
     const updated = { ...newBasket[idx], quantity } as any;
     newBasket[idx] = updated;
   }
+  
   if (isGuest(user)) {
     global.updateUserField("basket", newBasket);
-    // notify
     if (quantity <= 0) {
       global.pushNotification(`Removed from cart`, 'info');
     } else {

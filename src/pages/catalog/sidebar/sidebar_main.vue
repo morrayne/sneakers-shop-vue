@@ -39,12 +39,20 @@ function handleinput(event: Event) {
   padding: 0.5rem 1rem;
   opacity: 1;
 }
-
 :focus {
     outline: solid 1px var(--text-a);
 }
-
 ::placeholder {
   color: var(--text-c);
+}
+
+/* Телефоны */
+@media (max-width: 768px) {
+  .search {
+    width: calc(100% - 1rem);
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
 }
 </style>
