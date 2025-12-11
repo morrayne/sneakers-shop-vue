@@ -24,7 +24,7 @@ const global = useGlobalState();
 <style scoped lang="scss">
 .header-home {
   width: 100%;
-  height: 4rem;
+  max-height: 4rem;
   padding: 0 4rem;
   border-bottom: solid 0.125rem var(--bg-c);
   display: flex;
@@ -33,9 +33,14 @@ const global = useGlobalState();
   position: relative;
 
   .logo {
+    height: 100%;
     color: var(--text-a);
     font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
     z-index: 10;
+    cursor: pointer;
   }
 
   .header-nav {
@@ -50,11 +55,11 @@ const global = useGlobalState();
 
     * {
       height: 100%;
-      color: var(--main-header-text);
       padding: 0 2rem;
       display: flex;
       align-items: center;
       cursor: pointer;
+      color: transparent;
       &[href="/home"]::after { content: var(--home) }
       &[href="/catalog"]::after { content: var(--catalog) }
       &[href="/favourite"]::after { content: var(--favourites) }
@@ -64,7 +69,7 @@ const global = useGlobalState();
         color: var(--text-a);
         white-space: nowrap;
       }
-    }
+    } 
 
     *:hover, *:active, *:focus {
       background: var(--bg-c);
@@ -98,7 +103,7 @@ const global = useGlobalState();
       font-size: 1.3rem;
     }
     
-    .header-nav a {
+    .header-nav * {
       padding: 0 1.5rem;
       font-size: 0.9rem;
     }
@@ -120,7 +125,7 @@ const global = useGlobalState();
       font-size: 1.1rem;
     }
     
-    .header-nav a {
+    .header-nav * {
       padding: 0 1rem;
       font-size: 0.8rem;
     }
@@ -139,10 +144,10 @@ const global = useGlobalState();
     padding: 0 1rem;
     
     .logo {
-      font-size: 0.8rem;
+      font-size: 1rem;
     }
     
-    .header-nav a {
+    .header-nav * {
       padding: 0 0.7rem;
       font-size: 0.7rem;
     }
@@ -164,7 +169,7 @@ const global = useGlobalState();
       display: none;
     }
     
-    .header-nav a {
+    .header-nav * {
       padding: 0 0.5rem;
       font-size: 0.6rem;
     }
@@ -179,13 +184,9 @@ const global = useGlobalState();
 /* Очень маленькие телефоны */
 @media (max-width: 360px) {
   .header-home {
-    .header-nav a {
+    .header-nav * {
       padding: 0 0.3rem;
       font-size: 0.55rem;
-    }
-    
-    .logo {
-      font-size: 0.8rem;
     }
   }
 }
@@ -193,7 +194,7 @@ const global = useGlobalState();
 /* Дополнительно */
 @media (max-width: 320px) {
   .header-home {
-    .header-nav a {
+    .header-nav * {
       padding: 0 0.2rem;
       font-size: 0.5rem;
     }

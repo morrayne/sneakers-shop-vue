@@ -80,14 +80,16 @@ const getSneakerImagePath = () => {
         <div class="air-max">Nike Air Max Plus</div>
         <div class="created">
           <p>sneakers shop vue</p>
-          <p>created by 4lyne</p>
+          <p>created by redmorrayne</p>
         </div>
         <img class="main-sneaker" :src="getSneakerImagePath()" alt="Nike Air Max Plus" />
       </h1>
       <div class="bottom">
         <div class="line"></div>
         <div class="card" v-for="(item, index) in data" :key="index" @click="changeTheme(index)" :style="{ background: `linear-gradient(-45deg, ${item.color1}, ${item.color2})` }" :class="{ active: item.folderName === active }">
-          {{ item.characterName }}
+          <img :src="`home/${item.folderName}/character.webp`" alt="">
+          <p>{{ item.characterName }}</p>
+          <span>{{ item.folderName }}</span>
         </div>
       </div>
     </main>
@@ -181,21 +183,38 @@ main {
     }
 
     .card {
-      padding: 0.5rem 2rem;
-      border-radius: 0 1rem 0 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      width: 10rem;
+      aspect-ratio: 1 / 1;
+      padding: 0.25rem 0.5rem;
+      border-radius: 1rem;
       position: relative;
       bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
       transition: 0.4s;
       cursor: pointer;
       color: var(--main-header-text);
-      outline: solid 2px var(--main-header-text);
-      font-size: 1.5rem;
+      outline: solid 0.25rem var(--main-header-text);
 
       &:hover {
         bottom: 1rem;
+      }
+
+      img {
+        width: 50%;
+        aspect-ratio: 1 / 1;
+        margin-bottom: auto;
+      }
+
+      p {
+        font-size: 1.25rem;
+      }
+
+      span {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        opacity: 0.5;
       }
     }
   }

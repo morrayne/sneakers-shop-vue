@@ -24,7 +24,7 @@ const global = useGlobalState();
 <style scoped lang="scss">
 .header-home {
   width: 100%;
-  height: 4rem;
+  max-height: 4rem;
   padding: 0 4rem;
   border-bottom: solid 0.125rem var(--sub-header-bg);
   display: flex;
