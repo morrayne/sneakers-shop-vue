@@ -1,12 +1,12 @@
 <script setup lang="ts">
 // vue
-import { computed, onMounted, watch, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 // components
 import loading_main from "../../common/loading/loading_main.vue";
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
 import header_main from "../../common/header/header_main.vue";
-import basket_item from "./basket_item.vue";
+import basket_item_c from "./basket_item_c.vue";
 
 // pinia & supabase
 import { useGlobalState } from "../../helper/pinia";
@@ -15,10 +15,8 @@ import { updateUserField } from "../../helper/actions";
 const global = useGlobalState();
 
 // types & vars
-const totalCost = computed(() => { 
-  return basketItems.value.reduce((sum, item) => sum + ((item.cost || 0) * (item.quantity ?? 1)), 0) 
-});
-import type { sneaker_color, product_item } from "../../helper/types";
+const totalCost = computed(() => { return basketItems.value.reduce((sum, item) => sum + ((item.cost || 0) * (item.quantity ?? 1)), 0)});
+import type { sneaker_color, basket_item } from "../../helper/types";
 
 // state
 const loading = ref(true);
@@ -59,7 +57,7 @@ const basketItems = computed(() => {
   const user = global.user;
   if (!user) return [];
   if (!user.basket || user.basket.length === 0) return [];
-  return user.basket.map((basketItem: product_item) => {
+  return user.basket.map((basketItem: basket_item) => {
     const sneaker = sneakersMap.value.get(basketItem.id);
     if (!sneaker) return null;
     const colors = sneaker.colors as sneaker_color[];
@@ -80,13 +78,12 @@ const basketItems = computed(() => {
 async function handleItemRemoved(itemId: number, colorIndex: number, size: string) {
   const user = global.user;
   if (!user) return;
-  const updatedBasket = user.basket.filter((item: product_item) => {
+  const updatedBasket = user.basket.filter((item: basket_item) => {
     const sameId = item.id === itemId;
     const sameSize = item.size === size;
     const itemColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
     return !(sameId && sameSize && itemColorIndex === colorIndex);
   });
-  
   if (user.id === "Guest") { 
     global.updateUserField("basket", updatedBasket);
   } else { 
@@ -98,39 +95,28 @@ async function handleItemRemoved(itemId: number, colorIndex: number, size: strin
 async function handleSizeChanged(itemId: number, colorIndex: number, oldSize: string, newSize: string) {
   const user = global.user;
   if (!user || !user.basket) return;
-  
-  // Находим элемент в корзине
-  const itemIndex = user.basket.findIndex((item: product_item) => {
+  const itemIndex = user.basket.findIndex((item: basket_item) => {
     const sameId = item.id === itemId;
     const sameSize = item.size === oldSize;
     const itemColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
     return sameId && sameSize && itemColorIndex === colorIndex;
   });
-  
   if (itemIndex === -1) return;
-  
-  // Проверяем, есть ли уже такой же товар с новым размером
-  const existingItemIndex = user.basket.findIndex((item: product_item, index: number) => {
-    if (index === itemIndex) return false; // Пропускаем текущий элемент
+  const existingItemIndex = user.basket.findIndex((item: basket_item, index: number) => {
+    if (index === itemIndex) return false;
     const sameId = item.id === itemId;
     const sameColorIndex = typeof item.color === "number" ? item.color : sneakersMap.value.get(item.id)?.colors?.findIndex((c: any) => c.name === item.color) ?? -1;
     return sameId && sameColorIndex === colorIndex && item.size === newSize;
   });
-  
   let updatedBasket = [...user.basket];
-  
-  if (existingItemIndex !== -1) {
-    // Если такой товар с новым размером уже есть, объединяем количество и удаляем старый
+  if (existingItemIndex !== -1 && updatedBasket[existingItemIndex]) {
     const existingItem = updatedBasket[existingItemIndex];
     const currentItem = updatedBasket[itemIndex];
-    updatedBasket[existingItemIndex] = { ...existingItem, quantity: (existingItem.quantity || 1) + (currentItem.quantity || 1)};
-    // Удаляем старый элемент
+    updatedBasket[existingItemIndex] = { ...existingItem, quantity: (existingItem.quantity!) + (currentItem!.quantity!)};
     updatedBasket.splice(itemIndex, 1);
-  } else {
-    // Просто обновляем размер
+  } else if (updatedBasket[itemIndex]) {
     updatedBasket[itemIndex] = { ...updatedBasket[itemIndex], size: newSize };
   }
-  
   if (user.id === "Guest") {
     global.updateUserField("basket", updatedBasket);
   } else {
@@ -143,13 +129,7 @@ async function moveBasketToHistory() {
   const user = global.user;
   if (!user || !user.basket || user.basket.length === 0) return;
   try {
-    const order = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      items: [...user.basket],
-      total: totalCost.value,
-      status: 'completed' as const
-    };
+    const order = { id: Date.now(), date: new Date().toISOString(), items: [...user.basket], total: totalCost.value, status: 'completed' as const };
     const updatedHistory: any = user.history ? [...user.history, order] : [order];
     if (user.id === "Guest") {
       global.updateUserField("history", updatedHistory);
@@ -167,9 +147,6 @@ async function moveBasketToHistory() {
 
 // монтирование
 onMounted(() => { loadSneakers() });
-
-// УБИРАЕМ WATCH, КОТОРЫЙ ВЫЗЫВАЛ ПЕРЕЗАГРУЗКУ ПРИ КАЖДОМ ИЗМЕНЕНИИ КОРЗИНЫ
-// watch(() => global.user?.basket, () => { if (global.user) reLoadSneakers() }, { deep: true });
 </script>
 
 <template>
@@ -180,14 +157,7 @@ onMounted(() => { loadSneakers() });
         <div v-if="loading" class="loa">
           <loading_main />
         </div>
-        <basket_item 
-          v-else-if="basketItems.length > 0" 
-          v-for="item in basketItems" 
-          :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`" 
-          :data="item" 
-          @item-removed="handleItemRemoved"
-          @size-changed="handleSizeChanged"
-        />
+        <basket_item_c v-else-if="basketItems.length > 0" v-for="item in basketItems" :key="`${item.id}-${item.favouriteColor}-${item.favouriteSize}`" :data="item" @item-removed="handleItemRemoved" @size-changed="handleSizeChanged" />
         <div v-else-if="!loading && basketItems.length === 0" class="loa">
           <img src="/public/gif/evernight.gif" alt="No items" />
           <p> {{ getTranslatedText('emptyBasket') }} </p>

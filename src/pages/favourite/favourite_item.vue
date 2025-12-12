@@ -4,7 +4,7 @@ import { ref, computed } from "vue";
 
 // props & emits
 const props = defineProps<{ 
-  data: favourite_item; // Используем favourite_item вместо product_item
+  data: favourite_item;
   sneaker: sneaker_item | null
 }>();
 const emit = defineEmits<{

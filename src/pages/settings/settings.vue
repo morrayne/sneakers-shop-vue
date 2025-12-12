@@ -1,19 +1,42 @@
 <script setup lang="ts">
 // components & vars
+import { ref, onMounted } from 'vue';
 import header_main from "../../common/header/header_main.vue";
 import wrapper_main from "../../common/wrapper/wrapper_main.vue";
-const htmlElement = document.documentElement;
+
+// Реактивные переменные для отслеживания текущих значений
+const currentLang = ref<string>('ru');
+const currentTheme = ref<string>('dark');
+const currentHomeTheme = ref<string>('green');
+
+// Инициализация значений при загрузке компонента
+onMounted(() => {
+  const htmlElement = document.documentElement;
+  currentLang.value = localStorage.getItem('lang') || htmlElement.getAttribute('lang') || 'ru';
+  currentTheme.value = localStorage.getItem('theme') || htmlElement.getAttribute('data-theme') || 'dark';
+  currentHomeTheme.value = localStorage.getItem('homeTheme') || htmlElement.dataset.homeTheme || 'green';
+  updateHtmlAttributes();
+});
+
+// Обновление атрибутов HTML
+function updateHtmlAttributes() {
+  const htmlElement = document.documentElement;
+  htmlElement.setAttribute("lang", currentLang.value);
+  htmlElement.setAttribute("data-theme", currentTheme.value);
+  htmlElement.setAttribute("data-home-theme", currentHomeTheme.value);
+}
 
 // Сохранение конфига
 function saveConfig(field: string, val: string) {
   localStorage.setItem(field, val);
   if (field === "lang") {
-    htmlElement.setAttribute("lang", val);
+    currentLang.value = val;
   } else if (field === "theme") {
-    htmlElement.setAttribute("data-theme", val);
+    currentTheme.value = val;
   } else if (field === "homeTheme") {
-    htmlElement.setAttribute("data-home-theme", val);
+    currentHomeTheme.value = val;
   }
+  updateHtmlAttributes();
 }
 </script>
 
@@ -24,24 +47,24 @@ function saveConfig(field: string, val: string) {
       <div class="set">
         <p class="i18n" data-key="lang"></p>
         <div class="options">
-          <button @click="saveConfig('lang', 'ru')" class="i18n" data-key="ru"></button>
-          <button @click="saveConfig('lang', 'en')" class="i18n" data-key="en"></button>
+          <button @click="saveConfig('lang', 'ru')" :class="`${currentLang === 'ru' ? 'i18n selected' : 'i18n'}`" data-key="ru"></button>
+          <button @click="saveConfig('lang', 'en')" :class="`${currentLang === 'en' ? 'i18n selected' : 'i18n'}`" data-key="en"></button>
         </div>
       </div>
       <div class="set">
         <p class="i18n" data-key="common-theme"></p>
         <div class="options">
-          <button @click="saveConfig('theme', 'dark')" class="i18n" data-key="dark"></button>
-          <button @click="saveConfig('theme', 'light')" class="i18n" data-key="light"></button>
+          <button @click="saveConfig('theme', 'dark')" :class="`${currentTheme === 'dark' ? 'i18n selected' : 'i18n'}`" data-key="dark"></button>
+          <button @click="saveConfig('theme', 'light')" :class="`${currentTheme === 'light' ? 'i18n selected' : 'i18n'}`" data-key="light"></button>
         </div>
       </div>
       <div class="set">
         <p class="i18n" data-key="home-screen-theme"></p>
         <div class="options">
-          <button @click="saveConfig('homeTheme', 'green')" class="i18n" data-key="green"></button>
-          <button @click="saveConfig('homeTheme', 'pink')" class="i18n" data-key="pink"></button>
-          <button @click="saveConfig('homeTheme', 'blue')" class="i18n" data-key="blue"></button>
-          <button @click="saveConfig('homeTheme', 'yellow')" class="i18n" data-key="yellow"></button>
+          <button @click="saveConfig('homeTheme', 'green')" :class="`${currentHomeTheme === 'green' ? 'i18n selected' : 'i18n'}`" data-key="green"></button>
+          <button @click="saveConfig('homeTheme', 'pink')" :class="`${currentHomeTheme === 'pink' ? 'i18n selected' : 'i18n'}`" data-key="pink"></button>
+          <button @click="saveConfig('homeTheme', 'blue')" :class="`${currentHomeTheme === 'blue' ? 'i18n selected' : 'i18n'}`" data-key="blue"></button>
+          <button @click="saveConfig('homeTheme', 'yellow')" :class="`${currentHomeTheme === 'yellow' ? 'i18n selected' : 'i18n'}`" data-key="yellow"></button>
         </div>
       </div>
     </main>
@@ -78,11 +101,14 @@ main {
         color: var(--text-a);
         background: var(--bg-d);
       }
+
+      .selected {
+        background: var(--accent-a);
+      }
     }
   }
 }
 
-/* Локализация через CSS переменные */
 .i18n {
   color: transparent;
   &[data-key="lang"]::after {

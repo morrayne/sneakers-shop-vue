@@ -2,7 +2,7 @@
 import { computed } from "vue";
 
 // types
-import type { color_item, history_item, product_item, order_item } from "../../../helper/types";
+import type { color_item, history_item, order_item } from "../../../helper/types";
 
 // props
 const props = defineProps<{
@@ -24,7 +24,7 @@ function getTranslatedRub(): string {
 
 // Находим информацию о товарах в заказе
 const orderItems = computed(() => {
-  return props.order.items.map((item: product_item) => {
+  return props.order.items.map((item: any) => {
     const sneaker = props.sneakers.find((s: history_item) => s.id === item.id);
     return { ...item, sneaker: sneaker || null };
   });

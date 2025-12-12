@@ -14,7 +14,6 @@ import { supabase } from "../../helper/imp/supabase";
 const global = useGlobalState();
 
 // types & vars
-import type { product_item } from "../../helper/types";
 const loading = ref(true);
 const error = ref<string | null>(null);
 const sneakers = ref<any>([]);
@@ -36,9 +35,9 @@ async function fetchFavs() {
 }
 
 // удаление элемента
-async function handleItemRemoved(removedItem: product_item) {
+async function handleItemRemoved(removedItem: any) {
   if (global.user?.favourite) {
-    global.user.favourite = global.user.favourite.filter((item: product_item) => item.id !== removedItem.id || item.color !== removedItem.color);
+    global.user.favourite = global.user.favourite.filter((item: any) => item.id !== removedItem.id || item.color !== removedItem.color);
     if (global.user.id !== "Guest") {
       try {
         const { error } = await supabase.from("profiles").update({ favourite: global.user.favourite }).eq("id", global.user.id);

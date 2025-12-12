@@ -9,10 +9,10 @@ const global = useGlobalState();
 
 // types & vars
 const loading = ref(false);
-import type { basket_item } from "../../helper/types";
+import type { basket_item_s } from "../../helper/types";
 
 // props & emits
-const props = defineProps<{ data: basket_item }>();
+const props = defineProps<{ data: basket_item_s }>();
 const emit = defineEmits<{ "item-removed": [id: number, colorIndex: number, size: string] }>();
 
 // Функция для получения переведенной валюты
@@ -26,6 +26,7 @@ async function removeFromBasket() {
   if (loading.value) return;
   loading.value = true;
   try {
+    console.log(props.data);
     const { id, favouriteColor, favouriteSize, colors } = props.data;
     const colorName = colors[favouriteColor]?.name ?? "";
     if (!global.user) throw new Error("Пользователь не инициализирован");
@@ -47,7 +48,6 @@ async function removeFromBasket() {
 
 // изменение количества
 const quantityRef = ref(props.data.quantity ?? 1);
-
 async function changeQuantity(delta: number, event?: Event) {
   if (event) event.stopPropagation();
   const newQty = Math.max(0, (quantityRef.value || 1) + delta);
